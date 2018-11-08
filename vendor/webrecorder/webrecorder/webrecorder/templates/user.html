@@ -1,0 +1,101 @@
+{% extends "main_bootstrap.html" %}
+
+{% block title %} | {{ user }}'s Collections{% endblock %}
+
+{% block head %}
+
+{{ super() }}
+
+{% assets "user-js" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+{% assets "user-css" %}
+<link href="{{ ASSET_URL }}" rel="stylesheet" />
+{% endassets %}
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row collection-description page-archive" id="about">
+    <div class="col-xs-12" id="home-markdown" data-desc-url="/api/v1/users/{{ user }}/desc" style="display: none">{{ user_info.description }}</div>
+    <div class="col-xs-12" id="home-view"></div>
+    {% if is_owner() %}
+    <button id="home-edit" type="button" class="edit-description btn btn-default btn-xs icon-button" title="Edit collection description" aria-label="Edit collection description">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </button>
+    {% endif %}
+</div>
+
+{% if is_owner() %}
+<div class="row">
+    <div class="col-xs-6" style="padding-top: 14px">
+        <a class="btn btn-primary btn-sm" href="#" data-toggle="modal" data-target="#create-modal" role="button">
+            <span class="glyphicon glyphicon-plus glyphicon-button"></span>New Collection
+        </a>
+        <a class="btn btn-success btn-sm" href="#" data-toggle="modal" data-target="#upload-modal" data-backdrop="static" data-keyboard="false" role="button">
+            <span class="glyphicon glyphicon-upload glyphicon-button"></span>Upload...
+        </a>
+    </div>
+
+    <div class="col-xs-2 pull-right space-usage-info">
+        <strong>Space Used:</strong>
+        <span data-size={{ user_info.size }}></span>
+        <div class="progress space-usage">
+            <div class="progress-bar" role="progressbar" data-current-size="{{user_info.size}}" data-max-size="{{user_info.max_size}}" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <ul class="list-group collection-list">
+        {% for coll in collections | sort(attribute='title') %}
+        {% set is_public = coll['public'] %}
+        <li class="left-buffer list-group-item">
+            <div class="row">
+                <div class="col-xs-9">
+                    <a href="/{{ user }}/{{ coll.id }}" class="collection-title">{{ coll.title | default(coll.id) }}</a>
+                </div>
+                <div class="col-xs-2 collection-metadata">
+                    <div class="colls-size" data-size-display="{{ coll.size }}" style="font-size: 14px; margin-top: 4px; text-align: right"></div>
+                </div>
+                {% if is_public %}
+                <div class="cols-xs-1 collection-metadata glyphicon glyphicon-globe" title="Public Collection &mdash; Visible to Everyone" style="font-size: 14px; margin-top: 5px; margin-left: 12px; text-align: center"></div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="hidden markdown-src">{{ coll.desc|e }}</div>
+                <div class="col-xs-7 collection-desc markdown-html"></div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% if not collections %}
+    <p class="text-center" style="font-style: italic">
+        {% if is_owner() %}
+        No Collections (Yet)
+        {% else %}
+        No Available Collections
+        {% endif %}
+    </p>
+    {% endif %}
+
+</div>
+
+<script>
+    init_markdown_editor("/api/v1/users/{{ user }}/desc");
+</script>
+
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+{% include 'create_collection_modal.html' %}
+{% include 'upload_modal.html' %}
+{% endblock %}
+
+

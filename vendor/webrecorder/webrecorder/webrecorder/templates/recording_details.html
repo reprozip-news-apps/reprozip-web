@@ -1,0 +1,17 @@
+<table class="table table-recording-details hidden">
+    <caption><h6>Bookmarks</h6></caption>
+    <thead>
+        <tr>
+            <th><small>Url</small></th>
+            <th><small>Last Recorded</small></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for bookmark in recording.pages | sort(attribute='timestamp') %}
+    <tr>
+        <td><a href="{{ path + '/' + bookmark.url }}">{{ bookmark.url }}</a></td>
+        <td data-time-ts="{{ bookmark.timestamp if bookmark.timestamp else '' }}"></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>

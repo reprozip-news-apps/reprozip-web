@@ -1,0 +1,3 @@
+[reprounzip.unpackers]
+docker = reprounzip.unpackers.docker:setup
+

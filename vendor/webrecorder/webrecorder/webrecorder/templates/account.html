@@ -1,0 +1,125 @@
+{% extends "main_bootstrap.html" %}
+
+{% block title %} | {{ user }}'s Account Settings{% endblock %}
+
+{% block content %}
+<style>
+    .warn-limit {
+        color: #d44950;
+    }
+</style>
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Usage for <b>{{ curr_user }}</b></h2>
+        </div>
+        <div class="panel-body">
+            <div class="row col-md-9">
+                <table class="table">
+                    <tr>
+                        <th>Size</th>
+                        <td><b id="total-size" data-size-display="{{ user_info.size }}"></b> of <b id="max-size" data-size-display="{{ user_info.max_size }}"></b> used
+                        <div class="progress space-usage">
+                            <div class="progress-bar" role="progressbar" data-current-size="{{user_info.size}}" data-max-size="{{user_info.max_size}}" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                            </div>
+                        </div></td>
+
+                        <td class="warn-limit" id="limit-size"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row col-md-9">
+                <p>
+                    Please <a href="mailto:support@webrecorder.io">contact us</a> if you would like to request additional space.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="display: inline">Change Password</h3><p style="display: inline; margin-left: 10px; font-style: italic">Enter your current password, and your new password below.</p>
+        </div>
+        <div class="panel-body">
+            <div class="row col-md-3">
+                <form id="changepassword" action="/_updatepassword" method="post" role="form" data-toggle="validator" data-delay="1000">
+                    <div class="form-group">
+                        <label for="curr_password" class="">Current Password</label>
+                        <input type="password" id="curr_password" name="curr_password" class="form-control input-sm" value="" placeholder="" required="true">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="">New Password</label>
+                        <input type="password" id="password" data-minlength="8" name="password" class="form-control input-sm" placeholder="" required="true"
+                               pattern="(?=.*[\d\W])(?=.*[a-z])(?=.*[A-Z]).{8,}" data-error="Password must be at least 8 characters and contain lower, uppercase, and either digits or symbols">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="">Confirm New Password</label>
+                        <input type="password" id="confirmpassword" data-minlength="8" data-match="#password" name="confirmpassword" class="form-control input-sm"
+                               placeholder="" required="true" pattern="(?=.*[\d\W])(?=.*[a-z])(?=.*[A-Z]).{8,}" data-error="Password must be at least 8 characters and contain lower, uppercase, and either digits or symbols" data-match-error="Password confirmation does not match">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <button class="btn btn-primary btn-sm" type="submit">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h3 class="panel-title">Delete Account</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row col-md-6">
+                <div>
+                    <b>Permanently delete this account and all archived data for this user</b>
+                    <p>This action can not be undone!</p>
+                    <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#confirm-delete-modal">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm Delete Account?
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the <b>{{ curr_user }}</b> account?
+                If you continue, <b>all archived data in all collections will be permanently deleted.</b>
+                You will need to re-register to use the service again.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form class="delete-account-form" style="display: inline" method="post" action="/{{ curr_user }}/$delete">
+                    <input type="hidden" name="csrf" value="{{ csrf }}"/>
+                    <button type="submit" class="btn btn-danger btn-ok" id="confirm-delete">Confirm Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        if (parseInt($("#total-size").attr("data-size-display")) >= parseInt($("#max-size").attr("data-size-display"))) {
+            $("#limit-size").text("Size limit reached");
+            $("#total-size").addClass("warn-limit");
+        }
+
+        if (parseInt($("#num-coll").attr("data-count")) >= parseInt($("#max-coll").attr("data-count"))) {
+            $("#limit-coll").text("Max Collections Reached, No Additional Collections can be created");
+            $("#num-coll").addClass("warn-limit");
+        }
+    });
+</script>
+{% endblock %}

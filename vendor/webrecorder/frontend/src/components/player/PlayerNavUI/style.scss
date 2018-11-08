@@ -1,0 +1,129 @@
+@import 'src/vars';
+
+.landing-header {
+  z-index: 50;
+
+  #help {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    font-family: $sans;
+
+    svg {
+      margin-right: .5rem;
+    }
+  }
+}
+
+nav.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+  padding: 0 .8rem;
+  flex-shrink: 0;
+
+  background: $sidebarBg;
+  color: #e8e8e8;
+  border-bottom: .1rem solid $gray350;
+
+  .source {
+    color: #000;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .logos {
+    display: flex;
+    align-items: center;
+  }
+
+  .arrow {
+    transition: background $quickShift ease-in-out;
+    border-radius: .4rem;
+    padding: .1rem .2rem;
+
+    &:not(:last-of-type) {
+      margin-right: .2rem;
+    }
+
+    svg path {
+      fill: #6E6E6E;
+    }
+
+    &.inactive {
+      path {
+        fill: #CECECE;
+      }
+    }
+
+    svg {
+      // transition: background 175ms ease-in-out;
+      // padding: .5rem;
+      // height: 2.5rem;
+      // border-radius: .5rem;
+      padding: .2rem;
+      vertical-align: middle;
+    }
+
+    &:not(.inactive):hover {
+      background: $gray300;
+    }
+  }
+
+  button {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    vertical-align: middle;
+    color: #000;
+  }
+
+  .player-functions button {
+    transition: color $quickShift ease-in-out;
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  #help {
+    svg {
+      vertical-align: middle;
+    }
+
+    &:hover {
+      svg {
+        path {
+          fill: $blue;
+        }
+      }
+    }
+  }
+
+  .logotype {
+    margin-left: 1rem;
+  }
+
+  .wrLogoImg {
+    height: 2rem;
+  }
+
+  .openFile {
+    height: 3rem;
+  }
+
+  .halp {
+    height: 2rem;
+  }
+
+  .browser-nav {
+    display: flex;
+    align-items: center;
+
+    margin: 0 1.5rem;
+  }
+}

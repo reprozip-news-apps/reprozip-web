@@ -1,0 +1,47 @@
+<!-- Report -->
+<div class="modal fade" id="report-modal" tabindex="-1" role="dialog" aria-labelledby="report-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>This Page Doesn't Look Right? Let Us Know!</h4>
+                <p>Some pages are tricky for {{ metadata.product }} to capture and replay. Our goal is to make it work as best as possible on any page!</p>
+                <p>Please indicate anything that may have gone wrong on this page. Your feedback will help make {{ metadata.product }} better!</p>
+            </div>
+            <form method="post" action="/_reportissues" id="report-form">
+                <div class="modal-body">
+                    <div>
+                        <input type="checkbox" name="loading" id="err_loading" value="true"/>&nbsp;<label for="err_loading">Page not loading</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="missing" id="err_missing" value="true"/>&nbsp;<label for="err_missing">Missing content (Images, Video)</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="video" id="err_video" value="true"/>&nbsp;<label for="err_video">Video/Audio not playing</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="embed" id="err_embed" value="true"/>&nbsp;<label for="err_embed">Embedded content issues</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="scrolling" id="err_scrolling" value="true"/>&nbsp;<label for="err_scrolling">Scrolling issues</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="leak" id="err_leak" value="true"/>&nbsp;<label for="err_leak">Some items not archived, loading from live web</label>
+                    </div>
+                    <div class="top-buffer">
+                        <label for="desc" class="sr-only">Additional Info:</label>
+                        <textarea name="desc" id="desc" placeholder="Additional Info (optional)" class="form-control"></textarea>
+                    </div>
+                    <div class="top-buffer">
+                        <label for="email">Email to notify when this issue is fixed: (optional)</label>
+                        <input name="email" id="email" placeholder="Email" class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p id="report-thanks" class="pull-left"></p>
+                    <button id="report-form-submit" type="submit" class="btn btn-primary">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+
+.wr-content {
+  overflow: auto;
+}
+
+#app {
+    height: 100vh;
+}
+
+/* animations */
+@keyframes spin {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}

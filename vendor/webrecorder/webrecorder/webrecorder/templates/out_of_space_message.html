@@ -1,0 +1,36 @@
+{% if (is_owner() or not user) and is_out_of_space() and not error %}
+
+    {% if is_anon() %}
+        {% set message = "
+
+        <p><strong>Your are out of space in your temporary collection.</strong>  This means you can't record anything right now.</p>
+
+        <p>To be able to record again, you can:</p>
+
+        <ul>
+            <li><a href='/_register'>Sign up</a> for an account.</li>
+            <li>Download some recordings and then delete them to make space.</li>
+        </ul>
+
+        "%}
+    {% else %}
+        {% set message = "
+
+        <p><strong>Your account is out of space.</strong>  This means you can't record anything right now.</p>
+
+        <p>To be able to record again, you can:</p>
+
+        <ul>
+            <li>Download some collections or recordings and then delete them to make space.</li>
+            <li><a href='mailto:support@webrecorder.io'>Contact Us</a> to request more space.</li>
+        </ul>
+
+        "%}
+    {% endif %}
+
+    
+    {% set msg_type = "warning" %}
+
+    {% include 'flash_message.html' %}
+
+{% endif %}

@@ -1,0 +1,12 @@
+[console_scripts]
+reprounzip = reprounzip.main:main
+
+[reprounzip.unpackers]
+chroot = reprounzip.unpackers.default:setup_chroot
+directory = reprounzip.unpackers.default:setup_directory
+graph = reprounzip.unpackers.graph:setup
+info = reprounzip.pack_info:setup_info
+installpkgs = reprounzip.unpackers.default:setup_installpkgs
+provviewer = reprounzip.unpackers.provviewer:setup
+showfiles = reprounzip.pack_info:setup_showfiles
+

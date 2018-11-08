@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ metadata.product }}{% block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" href="/static/images/favicon.png">
+
+        <script>
+            window.curr_user = "{{ curr_user if curr_user else '' }}";
+            window.curr_mode = "{{ curr_mode }}";
+            window.user = "{{ user }}";
+            window.coll = "{{ coll_name }}";
+            window.rec = "{{ rec_name }}";
+            window.browsers = {{ get_browsers() }};
+            window.contentHost = "{{ get_content_host() }}";
+        </script>
+
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body class="{{ get_body_class(action) }}">
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

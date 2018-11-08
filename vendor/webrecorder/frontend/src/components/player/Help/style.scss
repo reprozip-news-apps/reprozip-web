@@ -1,0 +1,126 @@
+@import 'src/vars';
+
+.help-container {
+  background-image: url('../../../shared/images/Bg.png');
+  background-repeat: repeat;
+  padding-top: 2rem;
+
+  .help {
+    padding: 25px;
+    width: 75vw;
+    padding-bottom: 10rem;
+    background: #FFF;
+    font-family: $sans;
+    margin: 2.5rem auto;
+
+    h3 {
+      font-size: 2rem;
+      margin: 0 0 0.8rem 0;
+    }
+
+    h4 {
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: lighter;
+    }
+
+    h5 {
+      font-size: 1.9rem;
+      margin: 3rem 0 0.3rem 0;
+      color: $blue;
+
+      &:first-child {
+        margin: 0 0 0.3rem 0;
+      }
+    }
+
+    p {
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+      margin: 1.2rem auto;
+    }
+
+    li {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    a {
+      color: #4D6AE1;
+      text-decoration: none;
+
+      &:hover{
+        color: $blue !important;
+        box-shadow: 0 .3rem 0 $blue;
+      }
+
+      &:active{
+        color: $blue;
+        box-shadow: 0 .4rem 0 $blue;
+      }
+
+      &:visited{
+        color: #4D6AE1;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .support {
+    margin-top: 2rem;
+    font-style: italic;
+    width: 70%;
+
+    hr {
+      border: transparent;
+      border-top: .1rem solid #ccc;
+      height: .1rem;
+    }
+
+    p {
+      font-size: 1.3rem;
+    }
+  }
+
+  .debug-heading {
+    display: inline-block;
+  }
+
+  .debug-toggle {
+    transition: border-color 125ms ease-in-out,
+                color 125ms ease-in-out;
+    background: none;
+    border: solid 1px black;
+    color: black;
+    margin-left: 1rem;
+    border-radius: .3rem;
+    vertical-align: text-bottom;
+    padding: 0 .5rem;
+
+    &:hover {
+      color: blue;
+      border-color: blue;
+    }
+  }
+
+  .stdout-debug {
+    transition: height 300ms ease-in-out;
+    background-color: rgb(240,240,240);
+    max-height: 50rem;
+    margin-top: 1rem;
+
+    &.open {
+      overflow: auto;
+    }
+
+    &:not(.open) {
+      overflow: hidden;
+    }
+
+    & > p {
+      margin: 0;
+      padding: 1.5rem;
+    }
+  }
+
+}

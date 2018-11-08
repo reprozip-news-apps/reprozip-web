@@ -1,0 +1,127 @@
+@import 'src/vars';
+
+.wr-coll-sidebar .lists-body ul li .wrapper .visibility-lamp svg {
+    vertical-align: top;
+    g > g {
+        fill: $gray500;
+    }
+}
+
+.wr-coll-sidebar .lists-body ul li.all-pages .wrapper .visibility-lamp svg {
+    vertical-align: top;
+}
+
+.private-coll {
+    .visibility-lamp {
+        &.is-public {
+            &.open {
+                border: 1px solid $gray500;
+            }
+            .bulb {
+                color: $gray500;
+            }
+            .lamp {
+                background: $gray500;
+            }
+        }
+    }
+}
+
+.visibility-lamp {
+    position: absolute;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: .5rem;
+    cursor: pointer;
+
+    transition: background $quickShift ease-in-out;
+    min-width: 2.4rem;
+    text-align: center;
+    height: 2.4rem;
+    padding: 0.4rem;
+    border-radius: 2.4rem;
+    border: 1px solid rgba(0,0,0,0);
+
+    &.open {
+        background: $white;
+    }
+
+    &:not(.is-public) {
+        &.open {
+            border:1px solid $gray500;
+
+            .bulb > span {
+                opacity: 1;
+            }
+        }
+
+        .bulb {
+            color: $gray500;
+        }
+    }
+
+    &.is-public {
+        &.open {
+            border: 1px solid $brightGreen;
+
+            .bulb > span {
+                opacity: 1;
+            }
+        }
+
+        .bulb {
+            color: $brightGreen;
+        }
+    }
+
+    .lamp {
+         background: $brightGreen;
+         border-radius: 1.4rem;
+         width: 1.4rem;
+         height: 1.4rem;
+         display: inline-block;
+    }
+
+    & > div{
+
+    }
+
+    .svg {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .bulb {
+        transition: width $midShift ease-in-out;
+        height: 1.4rem;
+        overflow:hidden;
+        font-size: 1rem;
+        text-transform: uppercase;
+        display: inline-block;
+        text-align: center;
+        justify-content: left;
+        align-items: center;
+
+        svg {
+            width: 1rem;
+            height: 1rem;
+
+            path {
+                fill: #FFF;
+            }
+        }
+
+        .wr-loader {
+            path {
+                fill: #000;
+            }
+        }
+
+        span {
+            transition: opacity $midShift ease-in-out;
+            padding-right: 0.4rem;
+            opacity: 0;
+        }
+    }
+}

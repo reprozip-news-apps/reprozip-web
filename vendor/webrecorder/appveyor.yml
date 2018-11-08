@@ -1,0 +1,54 @@
+environment:
+  global:
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C obvci_appveyor_python_build_env.cmd"
+  matrix:
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "64"
+
+install:
+  - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER -and $env:APPVEYOR_BUILD_NUMBER -ne ((Invoke-RestMethod `
+        https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG/history?recordsNumber=50).builds | `
+        Where-Object pullRequestId -eq $env:APPVEYOR_PULL_REQUEST_NUMBER)[0].buildNumber) { `
+          throw "There are newer queued builds for this pull request, failing early." }
+
+  - "git submodule update --init --recursive"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "python -m pip install --upgrade pip"
+  - "pip install -U setuptools"
+  - "pip install pyinstaller==3.3"
+  - "pip install urllib3==1.23"
+  - "pip install cffi"
+  - "pip install pyopenssl"
+  - "pip install pyyaml"
+  - "pip install coverage pytest-cov codecov"
+  - "pip install certauth boto youtube-dl"
+
+build_script:
+  - ps: "cd webrecorder"
+  - "python setup.py install"
+
+test_script:
+  - "python setup.py test"
+
+after_test:
+  - ps: "cd webrecorder/standalone"
+  - pyinstaller --clean --additional-hooks-dir ./hooks/ -w -y -F ./webrecorder_player.py
+  - "move .\\dist\\webrecorder_player.exe %APPVEYOR_BUILD_FOLDER%\\webrecorder-player-win-x%PYTHON_ARCH%.exe"
+  - "%APPVEYOR_BUILD_FOLDER%\\webrecorder-player-win-x%PYTHON_ARCH%.exe -v"
+
+artifacts:
+  - path: webrecorder-player*.exe
+    name: webrecorder-player
+
+deploy:
+  provider: S3
+  region: $(aws_s3_region)
+  bucket: $(aws_s3_bucket)
+  access_key_id: $(aws_access_key_id)
+  secret_access_key: $(aws_secret_access_key)
+  folder: "webrecorder-player/$(APPVEYOR_REPO_BRANCH)"
+  artifact: webrecorder-player

@@ -1,0 +1,31 @@
+@import 'src/vars';
+
+.wr-list-header {
+    .banner {
+        display: flex;
+        margin: 1.5rem 0 0 1.5rem;
+        font-size: 1.2rem;
+
+        svg {
+            flex-shrink: 0;
+            margin: .5rem 1rem 0 0;
+        }
+
+        h2 {
+            display: inline-block;
+            font-size: 2.4rem;
+            font-weight: 300;
+            color: $gray600;
+            margin: 0;
+        }
+    }
+
+    .Collapsible {
+        margin: 0 0 1.5rem 1.5rem;
+        cursor: pointer;
+
+        .click-highlight {
+            display: inline-block;
+        }
+    }
+}

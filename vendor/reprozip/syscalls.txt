@@ -1,0 +1,44 @@
+process syscalls
+ x  clone
+ x  fork
+ x  vfork
+    unshare
+
+
+file opening syscalls
+ x  creat
+ x  execve
+    mkdir
+ x  open
+    rename
+    rmdir
+    link
+    symlink
+    truncate truncate64
+    unlink
+    linkat
+    mkdirat
+    openat
+    renameat
+    symlinkat
+    unlinkat
+ x  chdir
+    mq_open
+    mq_unlink
+    name_to_handle_at
+
+
+file stat syscalls
+ x  oldstat stat stat64
+ x  oldlstat lstat lstat64
+ x  access
+    faccessat
+ x  readlink
+    chmod
+    chown chown32
+    lchown lchown32
+    utime utimes
+    fchmodat
+    fchownat
+    readlinkat
+    fstatat fstatat64
