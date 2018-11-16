@@ -6,8 +6,10 @@ name = "pypi"
 [packages]
 pywb = "*"
 pipenv = "*"
-reprounzip-docker = {editable = true, path = "./../reprozip/reprounzip-docker"}
-reprounzip = {editable = true, path = "./../reprozip/reprounzip"}
+simplechrome = {git = "https://github.com/webrecorder/simplechrome.git",ref = "master"}
+cripy = {git = "https://github.com/webrecorder/chrome-remote-interface-py.git"}
+reprounzip = "*"
+reprounzip-docker = "*"
 
 [dev-packages]
 
