@@ -6,10 +6,13 @@ name = "pypi"
 [packages]
 pywb = "*"
 pipenv = "*"
-simplechrome = {git = "https://github.com/webrecorder/simplechrome.git",ref = "master"}
-cripy = {git = "https://github.com/webrecorder/chrome-remote-interface-py.git"}
 reprounzip = "*"
 reprounzip-docker = "*"
+requests = "*"
+pychrome = "*"
+pyppeteer = "*"
+pyyaml = "*"
+docker = "*"
 
 [dev-packages]
 
