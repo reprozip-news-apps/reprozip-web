@@ -41,6 +41,7 @@ First run reprozip trace. For example (on Linux):
 ```
 $ cd example/hello-mars
 $ reprozip trace .
+```
 
 (You can skip the trace step if you just want to run the sample)
 
