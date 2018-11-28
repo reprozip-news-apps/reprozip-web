@@ -36,11 +36,20 @@ $ ./scripts/bootstrap.sh
 
 ## Package a Site Using ReproZip
 
-For example:
+First run reprozip trace. For example (on Linux):
+
+```
+$ cd example/hello-mars
+$ reprozip trace .
+
+(You can skip the trace step if you just want to run the sample)
+
+Now pack it. To pack the example in a non-Linux environment, you can do this:
 
 ```
 $ ./scripts/pack-hello-mars.sh
 ```
+You should see a new .rpz file in the example directory.
 
 ## Record the Site Using Webrecorder
 
@@ -53,9 +62,9 @@ $ ./scripts/record-rpz.sh hello-mars/hello-mars-20185814T155819.rpz 8000
 You should see the WARC file in the package now:
 
 ```
-$ tar -t -f hello-mars/hello-mars.rpz
+$ tar -t -f hello-mars/hello-mars-20185814T155819.rpz
 ```
 
 ## Caveats
 
-Your mileage may vary. You may need to authorize the Chrome instance on your machine the first time it runs.
+Your mileage may vary. You may need to authorize the Chromium instance on your machine the first time it runs.

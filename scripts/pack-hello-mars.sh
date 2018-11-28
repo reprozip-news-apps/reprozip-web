@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "$(dirname $0)/../hello-mars"
+cd "$(dirname $0)/../example/hello-mars"
 
 docker build -t savingdatajournalism/hello-mars .
 
