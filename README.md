@@ -34,7 +34,7 @@ Download a browser client for the recording service and initialize your config f
 $ ./scripts/bootstrap.sh
 ```
 
-## Package a Site Using ReproZip
+## Package a site using ReproZip
 
 First run reprozip trace. For example (on Linux):
 
@@ -45,14 +45,22 @@ $ reprozip trace .
 
 (You can skip the trace step if you just want to run the sample)
 
-Now pack it. To pack the example in a non-Linux environment, you can do this:
+Now pack it.
+
+```
+$ reprozip pack hello-mars
+```
+
+To pack the example in a non-Linux environment (i.e., for testing),
+you can just do this:
 
 ```
 $ ./scripts/pack-hello-mars.sh
 ```
 You should see a new .rpz file in the example directory.
 
-## Record the Site Using Webrecorder
+
+## Record the site using Webrecorder
 
 For example:
 
@@ -65,6 +73,10 @@ You should see the WARC file in the package now:
 ```
 $ tar -t -f hello-mars/hello-mars-20185814T155819.rpz
 ```
+
+## Replay the site and verify fidelity
+
+This work is currently in progress.
 
 ## Caveats
 
