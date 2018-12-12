@@ -65,7 +65,7 @@ You should see a new .rpz file in the example directory.
 For example:
 
 ```
-$ ./scripts/record-rpz.sh hello-mars/hello-mars-20185814T155819.rpz 8000
+$ ./scripts/rpz-player.sh record hello-mars/hello-mars-20185814T155819.rpz 8000
 ```
 
 You should see the WARC file in the package now:
@@ -76,7 +76,10 @@ $ tar -t -f hello-mars/hello-mars-20185814T155819.rpz
 
 ## Replay the site and verify fidelity
 
-This work is currently in progress.
+```
+$ ./scripts/rpz-player.sh replay hello-mars 8000
+```
+Now tab to your Chromium browser, turn off your wifi, and hit reload!
 
 ## Caveats
 

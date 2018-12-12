@@ -8,9 +8,10 @@ import requests
 config_file = open('config.yml', 'r')
 config = yaml.load(config_file)
 
-PROXY_HOST = os.getenv('PROXY_HOST')
+PROXY_HOST = 'localhost'
 PROXY_PORT = os.getenv('PROXY_PORT')
-SITE_URL = os.getenv('SITE_URL')
+WAYBACK_PORT = os.getenv('WAYBACK_PORT')
+REPLAY_SERVER_NAME = os.getenv('REPLAY_SERVER_NAME')
 CHROME_EXEC = config['CHROMIUM_EXEC']
 CDP_PORT = '9222'
 
@@ -18,7 +19,7 @@ def cdp_url():
     return "http://localhost:{}".format(CDP_PORT)
 
 def main():
-    subprocess.Popen([CHROME_EXEC, '--proxy-server={}:{}'.format(PROXY_HOST, PROXY_PORT), '--remote-debugging-port={}'.format(CDP_PORT)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.Popen([CHROME_EXEC, '--proxy-server=http={}:{};https={}:{}'.format(PROXY_HOST, PROXY_PORT, PROXY_HOST, WAYBACK_PORT), '--remote-debugging-port={}'.format(CDP_PORT), '--ignore-certificate-errors'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     while True:
         try:
@@ -35,6 +36,6 @@ def main():
     tab = browser.new_tab()
     tab.start()
     tab.call_method("Network.enable")
-    tab.call_method("Page.navigate", url=SITE_URL, _timeout=5)
+    tab.call_method("Page.navigate", url="http://{}".format(REPLAY_SERVER_NAME), _timeout=5)
 
 main()

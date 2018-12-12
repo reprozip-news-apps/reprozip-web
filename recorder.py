@@ -13,7 +13,7 @@ PYWB_URL = os.getenv('PYWB_URL', 'http://localhost:8080')
 WB_COLLECTION = os.getenv('COLLECTION_NAME')
 CHROME_EXEC = config['CHROMIUM_EXEC']
 CDP_PORT = '9222'
-TARGET_URL = os.getenv('TARGET_URL', 'http://localhost:8000')
+TARGET_URL = os.getenv('TARGET_URL')
 
 url_queue = deque()
 
