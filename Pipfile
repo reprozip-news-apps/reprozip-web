@@ -4,15 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pywb = "*"
-pipenv = "*"
-reprounzip = "*"
-reprounzip-docker = "*"
-requests = "*"
-pychrome = "*"
-pyppeteer = "*"
-pyyaml = "*"
-docker = "*"
+reprounzip-docker = {editable = true,git = "https://git@github.com/ViDA-NYU/reprozip.git",subdirectory = "reprounzip-docker"}
 
 [dev-packages]
 

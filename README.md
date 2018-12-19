@@ -12,7 +12,7 @@ brew install docker
 
 You will also need python3 and pip.
 
-## Install
+## Development Install
 
 Install pipenv:
 
@@ -20,18 +20,28 @@ Install pipenv:
 $ pip install pipenv
 ```
 
-Install the project's dependencies:
+Create a virtual environment
 
 ```
-$ pipenv install
+$ pipenv --python 3.7.1
 ```
 
-## Bootstrap
-
-Download a browser client for the recording service and initialize your config file:
+Install dependencies
 
 ```
-$ ./scripts/bootstrap.sh
+pipenv install
+```
+
+Install the app/package
+
+```
+$ pip install -e .
+```
+
+Start the virtual env shell:
+
+```
+pipenv shell
 ```
 
 ## Package a site using ReproZip
@@ -65,7 +75,7 @@ You should see a new .rpz file in the example directory.
 For example:
 
 ```
-$ ./scripts/rpz-player.sh record hello-mars/hello-mars-20185814T155819.rpz 8000
+reprounzip dj hello-mars/hello-mars-20185814T155819.rpz target 8000
 ```
 
 You should see the WARC file in the package now:

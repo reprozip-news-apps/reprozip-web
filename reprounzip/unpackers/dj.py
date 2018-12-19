@@ -40,8 +40,6 @@ def shutdown(sig, frame):
     subprocess_manager.shutdown()
     sys.exit(0)
 
-signal.signal(signal.SIGINT, shutdown)
-
 
 # Wraps the wayback record service
 class Recorder(object):
@@ -64,7 +62,7 @@ class Recorder(object):
         except Exception as e:
             logger.debug(e)
             logger.warn("Wayback service failed to start")
-            sys.exit(1)
+            raise e
 
         tries = 10
         success = False
@@ -161,7 +159,7 @@ class Driver(object):
                 seconds_since_something_happened = 0
             tab.set_listener("Network.loadingFinished", reset_secs)
             tab.call_method("Page.navigate", url=record_url)
-            while seconds_since_something_happened < 10:
+            while seconds_since_something_happened < 20:
                 logger.info("Waiting for resources to load in browser")
                 tab.wait(1)
                 seconds_since_something_happened += 1
@@ -181,9 +179,12 @@ def pack_warc(rpz_file, pywb_root, coll='warc-data'):
     rpz.add('{}/{}'.format(warc_path, warc), arcname=warc, recursive=False)
     logger.debug(rpz.getmembers())
     rpz.close()
-    # Todo: add indexes or make sure playback includes indexing
 
-def record(args):
+    # TODO:
+    # add indexes, or make sure playback includes indexing
+    return 0
+
+def run_site(args):
     rpz_file = args.pack[0]
     rpz_path = Path(rpz_file)
     if not rpz_path.exists():
@@ -251,45 +252,59 @@ def record(args):
     else:
         raise Exception("Failed to start site")
 
-    # above can setup replay too
-
-    recorder = Recorder(args.target[0], args.quiet).start()
-    subprocess_manager.register(recorder)
-
-    driver = Driver().start()
-    subprocess_manager.register(driver)
-
-    logger.info("Start recording")
-    driver.record("http://localhost:{}".format(port))
-    logger.info("Done recording: shutting down...")
-    subprocess_manager.shutdown()
-
-    sys.exit(0)
-
-    # TODO
-    # check the warc
-    # ask user if they need to do manual browse
-    # clenup and exit
+    return (container_name, port)
 
 
-def replay(args):
+# TODO
+# validate the warc
+# ask user if they need to do manual browse?
+# stop the reprounzip docker
+def record(args):
+    error = None
+    try:
+        container_name, port = run_site(args)
+        #reprozip/reprounzip/reprounzip/unpackers/common/misc.py#474
+        signal.signal(signal.SIGINT, shutdown)
+
+        recorder = Recorder(args.target[0], args.quiet).start()
+        subprocess_manager.register(recorder)
+
+        driver = Driver().start()
+        subprocess_manager.register(driver)
+
+        logger.info("Start recording")
+        driver.record("http://localhost:{}".format(port))
+        time.sleep(5) # ensure wayback finishes writing warc
+        recorder.kill()
+        pack_warc(args.pack[0], args.target[0])
+    except Exception as e:
+        logger.critical("Failure to record")
+        error = e
+    finally:
+        subprocess_manager.shutdown()
+        if error:
+            raise error
+        sys.exit(0)
+
+
+def playback(args):
     print("Not implemented")
 
 
 def setup(parser, **kwargs):
-    """Records site assets to a warc file and replays the site
+    """Records site assets to a warc file and playbacks the site
 
     You will need Docker to be installed on your machine.
 
     record                  Generate the warc and add it to the .rpz
 
-    replay                  Replay the site using the warc.
+    playback                  Playback the site using the warc.
                             (includes reprounzip docker run)
 
     For example:
 
         $ reprounzip dj record my_data_journalism_site.rpz target [--port]
-        $ reprounzip dj replay my_data_journalism_site.rpz target [--port]
+        $ reprounzip dj playback my_data_journalism_site.rpz target [--port]
 
     """
     subparsers = parser.add_subparsers(title="actions",
@@ -307,8 +322,7 @@ def setup(parser, **kwargs):
     parser_record.add_argument('--skip-run', action='store_true', help="skip reprounzip run")
     parser_record.add_argument('--quiet', action='store_true', help="shhhhhhh")
 
-
     parser_record.set_defaults(func=record)
 
-    parser_replay = subparsers.add_parser('replay')
-    add_opt_rpz_file(parser_replay)
+    parser_playback = subparsers.add_parser('playback')
+    add_opt_rpz_file(parser_playback)

@@ -6,11 +6,11 @@ CWD=$(pwd)
 # will run on. Perhaps this will be extractable from
 # the .rpz at some point
 if [ ! $1 ] || [ ! $2 ]; then
-    echo "Usage: record-rpz.sh RPZ_FILEPATH PORT_TO_RECORD"
+    echo "Usage: $0 RPZ_FILEPATH PORT_TO_RECORD"
     exit 0
 fi
 
-TARGET_HOST=http://localhost
+TARGET_HOST=localhost
 RPZ_FILE="$CWD/$1"
 PORT=$2
 NAME=${RPZ_FILE%%.*}
@@ -21,6 +21,11 @@ UNPACK_DIR=$TMP_DIR/$NAME
 if [ ! -e $RPZ_FILE ]; then
    echo "Can't find: $RPZ_FILE"
    exit 0
+fi
+
+if [! -e $TMP_DIR/wayback.out ]; then
+    echo "Removing tmp/wayback.out"
+    rm $TMP_DIR/wayback.out
 fi
 
 if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null ; then
@@ -47,7 +52,7 @@ fi
 
 reprounzip docker run --detach --expose-port $PORT:$PORT $UNPACK_DIR
 
-while ! curl -I $TARGET_HOST:$PORT | grep -m1 'HTTP/1.1 200 OK'; do
+while ! curl -I http://$TARGET_HOST:$PORT | grep -m1 'HTTP/1.1 200 OK'; do
     echo "Waiting for 200 response from the target"
     sleep 5
 done
