@@ -14,34 +14,24 @@ You will also need python3 and pip.
 
 ## Development Install
 
-Install pipenv:
+Recommendation: Use pipenv (or virtualenv) to create a virtual environment
 
 ```
 $ pip install pipenv
-```
-
-Create a virtual environment
-
-```
 $ pipenv --python 3.7.1
+$ pipenv shell
 ```
 
 Install dependencies
 
 ```
-pipenv install
+$ pip install -r requirements.txt
 ```
 
-Install the app/package
+Install the app
 
 ```
 $ pip install -e .
-```
-
-Start the virtual env shell:
-
-```
-pipenv shell
 ```
 
 ## Package a site using ReproZip
@@ -49,33 +39,16 @@ pipenv shell
 First run reprozip trace. For example (on Linux):
 
 ```
-$ cd example/hello-mars
+$ cd example
 $ reprozip trace .
 ```
-
-(You can skip the trace step if you just want to run the sample)
-
-Now pack it.
-
-```
-$ reprozip pack hello-mars
-```
-
-To pack the example in a non-Linux environment (i.e., for testing),
-you can just do this:
-
-```
-$ ./scripts/pack-hello-mars.sh
-```
-You should see a new .rpz file in the example directory.
-
 
 ## Record the site using Webrecorder
 
 For example:
 
 ```
-reprounzip dj hello-mars/hello-mars-20185814T155819.rpz target 8000
+reprounzip dj record dollar4docs-20170309-2.rpz target --port 3000
 ```
 
 You should see the WARC file in the package now:
@@ -84,13 +57,11 @@ You should see the WARC file in the package now:
 $ tar -t -f hello-mars/hello-mars-20185814T155819.rpz
 ```
 
-## Replay the site and verify fidelity
+## Replay the site and verify fidelity (in progress)
 
 ```
-$ ./scripts/rpz-player.sh replay hello-mars 8000
+$ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000
 ```
 Now tab to your Chromium browser, turn off your wifi, and hit reload!
 
-## Caveats
 
-Your mileage may vary. You may need to authorize the Chromium instance on your machine the first time it runs.
