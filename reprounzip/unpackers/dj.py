@@ -13,13 +13,59 @@ from collections import deque
 import os
 import tarfile
 from reprounzip import signals
+from reprounzip.common import RPZPack
 from reprounzip.unpackers.docker import docker_setup, docker_run, read_dict
+
 
 logger = logging.getLogger('reprounzip.dj')
 logger.setLevel(10)
 if len(logger.handlers) < 1:
     console_handler = logging.StreamHandler()
     logger.addHandler(console_handler)
+
+class InvalidRPZ(Exception):
+    pass
+
+class WARCPacker(object):
+
+    @staticmethod
+    def data_path(filename, prefix=Path('WARC_DATA')):
+        return prefix / filename.parts[-1]
+
+    def __init__(self, rpz_file):
+        self.tar = tarfile.open(str(rpz_file), 'a:')
+
+    def add_warc_data(self, target, coll='warc-data'):
+        for name in self.tar.getnames():
+            if name[0:9] == 'WARC_DATA':
+                raise InvalidRPZ("This RPZ archive already contains WARC data")
+        target = Path(target)
+        warc_path = target / 'collections' / coll / 'archive'
+        warc = sorted(os.listdir(warc_path))[-1]
+        warc_path = warc_path / warc
+        index_path = target / 'collections' / coll / 'indexes/autoindex.cdxj'
+        for path in [warc_path, index_path]:
+            self.tar.add(str(path), str(WARCPacker.data_path(path)), recursive=False)
+
+    def close(self):
+        self.tar.close()
+        self.seen = None
+
+
+class RPZPackWithWARC(RPZPack):
+    def unpack_warc(self, target, coll='warc-data'):
+        target = Path(target)
+        for name in  self.tar.getnames():
+            if name[0:9] == 'WARC_DATA':
+                member = self.tar.getmember(name)
+                dest_path = target / 'collections' / coll
+                if name[10:] == 'autoindex.cdxj':
+                    dest_path = dest_path / 'indexes'
+                else:
+                    dest_path = dest_path / 'archive'
+                member.name = name[10:]
+                self.tar.extract(member, dest_path)
+
 
 class SubprocessManager(object):
 
@@ -230,19 +276,6 @@ def shutdown(sig, frame):
 def register(stopable):
     subprocess_manager.register(stopable)
 
-def pack_warc(rpz_file, pywb_root, coll='warc-data'):
-    logger.debug("pack warc")
-    rpz = tarfile.open(Path(rpz_file), 'a')
-    warc_path = '{}/collections/{}/archive'.format(pywb_root, coll)
-    warc = sorted(os.listdir(warc_path))[-1]
-    rpz.add('{}/{}'.format(warc_path, warc), arcname=warc, recursive=False)
-    logger.debug(rpz.getmembers())
-    rpz.close()
-
-    # TODO:
-    # add indexes, or make sure playback includes indexing
-    return 0
-
 def find_container(target):
     unpacked_info = read_dict(target)
     image_name = unpacked_info['current_image'].decode()
@@ -279,7 +312,10 @@ def run_site(args):
 
     if not args.skip_setup:
         docker_setup(args)
-        subprocess.Popen(['wb-manager', 'init', 'warc-data'], cwd=args.target[0])
+        rpz = RPZPackWithWARC(rpz_file)
+        rpz.unpack_warc(target)
+        if not Path(target / 'collections').is_dir():
+            subprocess.Popen(['wb-manager', 'init', 'warc-data'], cwd=args.target[0])
 
 
     args.__setattr__('detach', True)
@@ -353,7 +389,9 @@ def record(args):
         if error:
             raise error
         if success:
-            pack_warc(args.pack[0], args.target[0])
+            packer = WARCPacker(Path(args.pack[0]))
+            packer.add_warc_data(args.target[0])
+            packer.close()
         sys.exit(0)
 
 
