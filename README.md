@@ -14,6 +14,13 @@ You will also need python3 and pip.
 
 ## Development Install
 
+Clone the repo:
+
+```
+$ git clone https://github.com/reprozip-news-apps/reprozip-news-apps
+$ cd reprozip-news-apps
+```
+
 Recommendation: Use pipenv (or virtualenv) to create a virtual environment
 
 ```
@@ -57,7 +64,7 @@ You should see the WARC file in the package now:
 $ tar -t -f hello-mars/hello-mars-20185814T155819.rpz
 ```
 
-## Replay the site and verify fidelity (in progress)
+## Replay the site and verify fidelity
 
 ```
 $ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000
