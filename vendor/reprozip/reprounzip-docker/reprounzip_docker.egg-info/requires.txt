@@ -1,2 +1,0 @@
-reprounzip>=1.0.10
-rpaths>=0.8

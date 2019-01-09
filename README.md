@@ -64,4 +64,13 @@ $ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000
 ```
 Now tab to your Chromium browser, turn off your wifi, and hit reload!
 
+## Skipping reprounzip unpacking on subsequent runs
+
+The app should shut down everything except the docker container running the rpz'd site.
+
+You can stop it yourself or just reuse it for subsequent playbacks and records:
+
+```
+$ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000 --skip-setup --skip-run
+```
 

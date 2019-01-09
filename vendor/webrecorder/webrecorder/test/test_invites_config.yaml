@@ -1,8 +1,0 @@
-invites_enabled: 'true'
-
-full_warc_prefix: 'local+file://'
-
-session.secret: 'secret'
-   
-session.key: __test_sesh
-

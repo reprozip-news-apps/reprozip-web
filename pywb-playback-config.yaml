@@ -1,0 +1,3 @@
+framed_replay: false
+proxy:
+  coll: warc-data
