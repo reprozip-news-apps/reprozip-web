@@ -4,11 +4,7 @@ A work-in-progress app that leverages ReproZip and Webrecorder to capture archiv
 
 ## Prerequisites
 
-You will need to install the Docker server and have it running on your system. For example, on OSX (using Homebrew):
-
-```
-brew install docker
-```
+You will need to install the Docker server and have it running on your system. See `https://docs.docker.com`
 
 You will also need python3 and pip. One way to do this is using Pyenv. For example, on OSX (using Homebrew):
 
