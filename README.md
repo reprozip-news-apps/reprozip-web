@@ -16,6 +16,12 @@ You will also need python3 and pip. One way to do this is using Pyenv. For examp
 brew install pyenv
 ```
 
+On Debian/Ubuntu:
+
+```
+sudo apt install python3.7 python3.7-dev virtualenv docker.io
+```
+
 ## Development Install
 
 At some point the app will likely be installed from a registry, like most Python libraries. For now, it must be
