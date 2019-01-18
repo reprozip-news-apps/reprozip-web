@@ -1,3 +1,4 @@
 framed_replay: false
 proxy:
   coll: warc-data
+  enable_content_rewrite: false
