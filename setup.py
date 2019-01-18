@@ -17,4 +17,6 @@ setup(name='reprounzip-dj',
           'pyppeteer',
           'pychrome',
           'docker'],
+      setup_requires=["pytest-runner"],
+      tests_require=['pytest'],
       description="Allows the ReproZip unpacker to record and replay data journalism websites packaged as .rpz files")
