@@ -272,7 +272,6 @@ def shutdown(sig, frame):
     subprocess_manager.shutdown()
     sys.exit(0)
 
-
 def register(stopable):
     subprocess_manager.register(stopable)
 
@@ -332,7 +331,6 @@ def run_site(args):
 
     logger.debug("Finding reprounzip container")
     container = find_container(target)
-
 
     tries = 20
     success = False
@@ -399,6 +397,7 @@ def playback(args):
     replay_server_name = 'rpzdj-repl.ay'
     error, network, proxy_container = None, None, None
     proxy_port = 8081
+    target_dir = os.path.abspath(args.target[0])
     try:
         container_name, port = run_site(args)
         signal.signal(signal.SIGINT, shutdown)
@@ -419,7 +418,7 @@ def playback(args):
         logger.info("PROXY NETWORK {}".format(network.name))
         network.connect(container_name)
 
-        pywb_container = client.containers.run('webrecorder/pywb', detach=True, remove=True, name='pywb-playback', network=network.name, volumes={'{}/{}'.format(os.getcwd(), args.target[0]): {'bind': '/webarchive'}, '{}/pywb-playback-config.yaml'.format(os.getcwd()): {'bind': '/webarchive/config.yaml'}}, ports={'8080/tcp': Wayback.PORT})
+        pywb_container = client.containers.run('webrecorder/pywb', detach=True, remove=True, name='pywb-playback', network=network.name, volumes={'{}'.format(target_dir): {'bind': '/webarchive'}, '{}/pywb-playback-config.yaml'.format(os.getcwd()): {'bind': '/webarchive/config.yaml'}}, ports={'8080/tcp': Wayback.PORT})
         register(pywb_container)
         Wayback.wait_for_service(Wayback.PORT)
 
