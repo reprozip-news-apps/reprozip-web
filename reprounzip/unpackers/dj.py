@@ -306,7 +306,7 @@ def wait_for_site(url):
             else:
                 logger.debug(r.status_code)
                 raise Exception
-        except AttributeError:
+        except Exception:
             tries -= 1
             print("Waiting for site to start, {} tries left".format(tries))
             time.sleep(5)

@@ -121,8 +121,8 @@ Terminal 1:
 $ reprozip pack /path/to/captured-site.rpz
 ```
 
-The final step is to merge the reprozip package with the recorded data:
+The final step is to merge the recorded data into the reprozip package:
 
 ```
-# reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
+$ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
 ```
