@@ -23,8 +23,16 @@ if len(logger.handlers) < 1:
     console_handler = logging.StreamHandler()
     logger.addHandler(console_handler)
 
+
 class InvalidRPZ(Exception):
     pass
+
+class BadArgument(Exception):
+    pass
+
+class MissingWARCData(Exception):
+    pass
+
 
 class WARCPacker(object):
 
@@ -41,7 +49,11 @@ class WARCPacker(object):
                 raise InvalidRPZ("This RPZ archive already contains WARC data")
         target = Path(target)
         warc_path = target / 'collections' / coll / 'archive'
-        warc = sorted(os.listdir(warc_path))[-1]
+        logger.debug(warc_path)
+        try:
+            warc = sorted(os.listdir(warc_path))[-1]
+        except IndexError as e:
+            raise MissingWARCData(warc_path)
         warc_path = warc_path / warc
         index_path = target / 'collections' / coll / 'indexes/autoindex.cdxj'
         for path in [warc_path, index_path]:
@@ -53,6 +65,7 @@ class WARCPacker(object):
 
 
 class RPZPackWithWARC(RPZPack):
+
     def unpack_warc(self, target, coll='warc-data'):
         target = Path(target)
         for name in  self.tar.getnames():
@@ -85,8 +98,6 @@ class SubprocessManager(object):
         logger.debug("all jobs stopped")
 
 
-# Wraps the wayback service
-# note: playback functionality moved to docker
 class Wayback(object):
     PORT = 8080
 
@@ -110,7 +121,6 @@ class Wayback(object):
         if success:
             return
         raise Exception("Wayback failed to start correctly")
-
 
     @classmethod
     def new_recorder(cls, root_dir, args):
@@ -143,7 +153,6 @@ class Wayback(object):
             self.proc.kill()
         except AttributeError:
             pass
-
 
     def start(self):
         try:
@@ -229,7 +238,6 @@ class Driver(object):
 
         logger.info("Chromium is fired up and ready to go!")
 
-
     def cdp_url(self):
         return "http://localhost:{}".format(self.CDP_PORT)
 
@@ -237,7 +245,6 @@ class Driver(object):
         if self.proc: self.proc.kill()
 
     def replay(self, url_to_visit):
-
         browser = pychrome.Browser(url=self.cdp_url())
         tab = browser.new_tab()
         tab.start()
@@ -245,9 +252,8 @@ class Driver(object):
         tab.call_method("Page.navigate", url=url_to_visit)
 
 
-    def record(self, url_to_visit):
+    def record(self, url_to_visit, keep_open=False):
         browser = pychrome.Browser(url=self.cdp_url())
-
         logger.info("Recording {}".format(url_to_visit))
         record_url = "http://{}:{}/{}/record/{}".format(self.PYWB_HOST, Wayback.PORT, self.coll_name, url_to_visit)
         tab = browser.new_tab()
@@ -261,19 +267,24 @@ class Driver(object):
             logger.info("Waiting for resources to load in browser")
             tab.wait(1)
             seconds_since_something_happened += 1
-
+        if keep_open:
+            return 0
         tab.stop()
         browser.close_tab(tab)
         return 0
 
+
 subprocess_manager = SubprocessManager()
+
 
 def shutdown(sig, frame):
     subprocess_manager.shutdown()
     sys.exit(0)
 
+
 def register(stopable):
     subprocess_manager.register(stopable)
+
 
 def find_container(target):
     unpacked_info = read_dict(target)
@@ -281,12 +292,40 @@ def find_container(target):
     client = docker.from_env()
     return list(c for c in client.containers.list() if c.image.tags.count("{}:latest".format(image_name)))[0]
 
+
+def wait_for_site(url):
+    logger.debug(url)
+    tries = 20
+    success = False
+    while (tries > 0):
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                success = True
+                break
+            else:
+                logger.debug(r.status_code)
+                raise Exception
+        except AttributeError:
+            tries -= 1
+            print("Waiting for site to start, {} tries left".format(tries))
+            time.sleep(5)
+
+    if success:
+        print("Site successfully responded")
+    else:
+        raise Exception("No response from target site")
+
+
 def run_site(args):
-    rpz_file = args.pack[0]
-    rpz_path = Path(rpz_file)
-    if not rpz_path.exists():
-        logger.critical("Can't Find RPZ file")
-        sys.exit(1)
+    logger.debug(args)
+    try:
+        rpz_path = Path(args.pack[0])
+        if not rpz_path.exists():
+            logger.critical("Can't Find RPZ file")
+            sys.exit(1)
+    except AttributeError:
+        pass
 
     target = Path(args.target[0])
     if target.exists() and not args.skip_setup:
@@ -297,12 +336,6 @@ def run_site(args):
         logger.critical("Target directory does not exist")
         sys.exit(1)
 
-    port = 80
-    if args.port:
-        port = args.port
-
-    # TODO: make sure port is clear
-
     args.__setattr__('base_image', None)
     args.__setattr__('install_pkgs', None)
     args.__setattr__('image_name', None)
@@ -311,58 +344,48 @@ def run_site(args):
 
     if not args.skip_setup:
         docker_setup(args)
-        rpz = RPZPackWithWARC(rpz_file)
+        rpz = RPZPackWithWARC(args.pack[0])
         rpz.unpack_warc(target)
-        if not Path(target / 'collections').is_dir():
-            subprocess.Popen(['wb-manager', 'init', 'warc-data'], cwd=args.target[0])
-
-
-    args.__setattr__('detach', True)
-    args.__setattr__('expose_port', ['{}:{}'.format(args.port, args.port)])
-    args.__setattr__('x11', None)
-    args.__setattr__('cmdline', None)
-    args.__setattr__('run', None)
-    args.__setattr__('x11_display', None)
-    args.__setattr__('pass_env', None)
-    args.__setattr__('set_env', None)
 
     if not args.skip_run:
+        args.__setattr__('detach', True)
+        args.__setattr__('expose_port', ['{}:{}'.format(args.port, args.port)])
+        args.__setattr__('x11', None)
+        args.__setattr__('cmdline', None)
+        args.__setattr__('run', None)
+        args.__setattr__('x11_display', None)
+        args.__setattr__('pass_env', None)
+        args.__setattr__('set_env', None)
         docker_run(args)
 
-    logger.debug("Finding reprounzip container")
-    container = find_container(target)
+    if not Path(target / 'collections').is_dir():
+        subprocess.Popen(['wb-manager', 'init', 'warc-data'], cwd=args.target[0])
 
-    tries = 20
-    success = False
-    while (tries > 0):
-        try:
-            r = requests.get("http://localhost:{}".format(args.port))
-            if r.status_code == 200:
-                success = True
-                break
-            else:
-                raise Exception
-        except Exception:
-            tries -= 1
-            print("Waiting for site to start, {} tries left".format(tries))
-            time.sleep(5)
-
-    if success:
-        print("Site successfully started")
-    else:
-        raise Exception("Failed to start site")
-
-    return (container.name, port)
+    try:
+        url = args.url[0]
+    except AttributeError:
+        url = "http://localhost:{}".format(args.port)
+    wait_for_site(url)
+    return url
 
 
-# TODO
-# validate the warc
-# stop the reprounzip docker
+def pack_it(args):
+    try:
+        packer = WARCPacker(Path(args.pack[0]))
+        packer.add_warc_data(args.target[0])
+        packer.close()
+    except AttributeError:
+        pass
+
+
 def record(args):
+    if args.skip_record:
+        pack_it(args)
+        return
     error = None
     success = False
     try:
-        container_name, port = run_site(args)
+        url = run_site(args)
         signal.signal(signal.SIGINT, shutdown)
 
         logger.info("Start recording")
@@ -375,10 +398,12 @@ def record(args):
         driver.start()
         register(driver)
 
-        driver.record("http://localhost:{}".format(port))
+        driver.record(url, args.keep_browser)
         time.sleep(5) # ensure wayback finishes writing warc
         success = True
 
+        if args.keep_browser:
+            input("Press Enter to stop recording and quit")
     except Exception as e:
         logger.critical("Failure to record")
         error = e
@@ -387,10 +412,17 @@ def record(args):
         if error:
             raise error
         if success:
-            packer = WARCPacker(Path(args.pack[0]))
-            packer.add_warc_data(args.target[0])
-            packer.close()
-        sys.exit(0)
+            pack_it(args)
+
+
+def live_record(args):
+    if args.url[0].find("http") != 0:
+        message = "Expected a URL but got '{}'".format(args.url[0])
+        raise BadArgument(message)
+    args.skip_setup = True
+    args.skip_run = True
+    args.skip_record = False
+    record(args)
 
 
 def playback(args):
@@ -399,10 +431,12 @@ def playback(args):
     proxy_port = 8081
     target_dir = os.path.abspath(args.target[0])
     try:
-        container_name, port = run_site(args)
+        url = run_site(args)
+        site_container = find_container(Path(target_dir))
+
         signal.signal(signal.SIGINT, shutdown)
 
-        logger.debug("Container {}".format(container_name))
+        logger.debug("Container {}".format(site_container.name))
 
         client = docker.from_env()
         logger.info("Pulling nginx container...this may take a while")
@@ -416,18 +450,18 @@ def playback(args):
             attachable=True
         )
         logger.info("PROXY NETWORK {}".format(network.name))
-        network.connect(container_name)
+        network.connect(site_container)
 
         pywb_container = client.containers.run('webrecorder/pywb', detach=True, remove=True, name='pywb-playback', network=network.name, volumes={'{}'.format(target_dir): {'bind': '/webarchive'}, '{}/pywb-playback-config.yaml'.format(os.getcwd()): {'bind': '/webarchive/config.yaml'}}, ports={'8080/tcp': Wayback.PORT})
         register(pywb_container)
         Wayback.wait_for_service(Wayback.PORT)
 
-        conf_string = subprocess.check_output(['sed', '-e', 's/PROXIED_SERVER/{}:{}/'.format(container_name, port), '-e', 's/SERVER_NAME/{}/'.format(replay_server_name), '-e', 's/PYWB_PORT/{}/'.format(Wayback.PORT), '-e', 's/PROXY_PORT/{}/'.format(proxy_port), 'replay-proxy-nginx.conf'])
-        conf_file = open('replay-proxy-for-{}.conf'.format(container_name), 'w')
+        conf_string = subprocess.check_output(['sed', '-e', 's/PROXIED_SERVER/{}:{}/'.format(site_container.name, args.port), '-e', 's/SERVER_NAME/{}/'.format(replay_server_name), '-e', 's/PYWB_PORT/{}/'.format(Wayback.PORT), '-e', 's/PROXY_PORT/{}/'.format(proxy_port), 'replay-proxy-nginx.conf'])
+        conf_file = open('replay-proxy-for-{}.conf'.format(site_container.name), 'w')
         conf_file.write(conf_string.decode())
         conf_file.close()
 
-        proxy_container = client.containers.run('nginx', detach=True, remove=True, name='replay-proxy', network=network.name, volumes={'{}/replay-proxy-for-{}.conf'.format(os.getcwd(), container_name): {'bind': '/etc/nginx/conf.d/server.conf', 'mode': 'ro'}}, ports={'{}/tcp'.format(proxy_port): proxy_port})
+        proxy_container = client.containers.run('nginx', detach=True, remove=True, name='replay-proxy', network=network.name, volumes={'{}/replay-proxy-for-{}.conf'.format(os.getcwd(), site_container.name): {'bind': '/etc/nginx/conf.d/server.conf', 'mode': 'ro'}}, ports={'{}/tcp'.format(proxy_port): proxy_port})
         register(proxy_container)
 
         driver = Driver.new_replay_driver()
@@ -441,7 +475,7 @@ def playback(args):
         error = e
     finally:
         if network:
-            network.disconnect(container_name)
+            network.disconnect(site_container)
             try:
                 network.disconnect(pywb_container)
             except docker.errors.NotFound:
@@ -450,14 +484,14 @@ def playback(args):
                 network.disconnect(proxy_container)
             except docker.errors.NotFound:
                 pass
+            except docker.errors.NullResource:
+                pass
             network.remove()
         subprocess_manager.shutdown()
 
         if error:
             raise error
         sys.exit(0)
-
-# TODO - stop containers too
 
 
 def setup(parser, **kwargs):
@@ -479,12 +513,20 @@ def setup(parser, **kwargs):
     subparsers = parser.add_subparsers(title="actions",
                                        metavar='', help=argparse.SUPPRESS)
 
-    for mode in ['playback', 'record']:
+    for mode in ['playback', 'record', 'live-record']:
         parser = subparsers.add_parser(mode)
-        parser.add_argument('pack', nargs=1, help="RPZ file")
+        parser.set_defaults(func=globals()[mode.replace("-", "_")])
+        if mode == 'live-record':
+            parser.add_argument('url', nargs=1, help="URL of the site to record")
+        else:
+            parser.add_argument('pack', nargs=1, help="RPZ file")
+
         parser.add_argument('target', nargs=1, help="target directory")
-        parser.add_argument('--port', dest='port', help="webserver port")
+        parser.add_argument('--port', dest='port', help="webserver port", default=80)
         parser.add_argument('--skip-setup', action='store_true', help="skip reprounzip setup")
         parser.add_argument('--skip-run', action='store_true', help="skip reprounzip run")
+        if mode == 'record':
+            parser.add_argument('--skip-record', action='store_true', help="Simply write WARC data from <target> back to <pack>")
+        if mode == 'record' or mode == 'live-record':
+            parser.add_argument('--keep-browser', action='store_true', help="Keep the Chromium browser open for manual recording")
         parser.add_argument('--quiet', action='store_true', help="shhhhhhh")
-        parser.set_defaults(func=globals()[mode])

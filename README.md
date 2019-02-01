@@ -94,3 +94,35 @@ You can stop it yourself or just reuse it for subsequent playbacks and records:
 $ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000 --skip-setup --skip-run
 ```
 
+## Packing and Recording Simultaneously
+
+You can run reprozip trace and record at the same time, using two different terminals
+(both on the site host, or one on the site host and one on a different host).
+
+Terminal 1:
+
+```
+$ cd /path/to/your/project
+$ reprozip trace .runserver
+```
+
+Terminal 2:
+
+```
+$ mkdir /path/to/target
+$ reprounzip dj live-record http://localhost:3000 /path/to/target
+```
+
+Wait for the recorder to finish, then go back to Terminal 1 and press CTRL-C.
+
+Terminal 1:
+
+```
+$ reprozip pack /path/to/captured-site.rpz
+```
+
+The final step is to merge the reprozip package with the recorded data:
+
+```
+# reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
+```
