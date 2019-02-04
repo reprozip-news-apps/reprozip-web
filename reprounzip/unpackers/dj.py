@@ -419,6 +419,15 @@ def live_record(args):
     record(args)
 
 
+def docker_pull_if_not_exists(client, image):
+    try:
+        client.images.get(image)
+    except docker.errors.ImageNotFound:
+        logger.info("Pulling Docker image %s... this may take a while",
+                    image.split(':', 1)[0])
+        client.images.pull(image)
+
+
 def playback(args):
     replay_server_name = 'rpzdj-repl.ay'
     network = site_container = pywb_container = proxy_container = None
@@ -433,10 +442,8 @@ def playback(args):
         logger.debug("Container {}".format(site_container.name))
 
         client = docker.from_env()
-        logger.info("Pulling nginx container...this may take a while")
-        client.images.pull('nginx:latest')
-        logger.info("Pulling pywb container...this may take a while")
-        client.images.pull('webrecorder/pywb:latest')
+        docker_pull_if_not_exists(client, 'nginx:latest')
+        docker_pull_if_not_exists(client, 'webrecorder/pywb:latest')
 
         network = client.networks.create(
             "rpzdj_{}".format(time.time_ns()),
