@@ -228,7 +228,7 @@ class Driver(object):
         tries = 5; res = None
         while tries > 0:
             try:
-                res = requests.get(cdp_url())
+                res = requests.get(self.cdp_url())
                 break
             except requests.RequestException:
                 time.sleep(5)
