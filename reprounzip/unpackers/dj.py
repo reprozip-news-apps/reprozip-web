@@ -260,15 +260,15 @@ class Driver(object):
         record_url = "http://{}:{}/{}/record/{}".format(self.PYWB_HOST, Wayback.PORT, self.coll_name, url_to_visit)
         tab = browser.new_tab()
         tab.start()
-        seconds_since_something_happened = 0
+        seconds_since_something_happened = [0]
         def reset_secs(**args):
-            seconds_since_something_happened = 0
+            seconds_since_something_happened[0] = 0
         tab.set_listener("Network.loadingFinished", reset_secs)
         tab.call_method("Page.navigate", url=record_url)
-        while seconds_since_something_happened < 20:
+        while seconds_since_something_happened[0] < 20:
             logger.info("Waiting for resources to load in browser")
             tab.wait(1)
-            seconds_since_something_happened += 1
+            seconds_since_something_happened[0] += 1
         if keep_open:
             return 0
         tab.stop()
