@@ -8,6 +8,7 @@ import signal
 import time
 import requests
 import docker
+import docker.errors
 import pychrome
 from collections import deque
 import os
@@ -113,7 +114,7 @@ class Wayback(object):
                     break
                 else:
                     raise Exception
-            except Exception:
+            except requests.RequestException:
                 tries -= 1
                 logger.info("Waiting for Wayback to start, {} tries left".format(tries))
                 time.sleep(5)
@@ -150,9 +151,11 @@ class Wayback(object):
 
     def stop(self):
         try:
-            self.proc.kill()
+            stop = self.proc.kill
         except AttributeError:
             pass
+        else:
+            stop()
 
     def start(self):
         try:
@@ -160,10 +163,9 @@ class Wayback(object):
             logger.debug(proc_args)
             self.proc = subprocess.Popen(proc_args, **self.output_args)
 
-        except Exception as e:
-            logger.debug(e)
-            logger.warn("Wayback service failed to start")
-            raise e
+        except Exception:
+            logger.exception("Wayback service failed to start")
+            raise
 
         Wayback.wait_for_service(Wayback.PORT)
 
@@ -228,7 +230,7 @@ class Driver(object):
             try:
                 res = requests.get(cdp_url())
                 break
-            except Exception as e:
+            except requests.RequestException:
                 time.sleep(5)
                 tries -= 1
                 logger.info("Waiting for browser to respond on port 9222")
@@ -297,16 +299,15 @@ def wait_for_site(url):
     logger.debug(url)
     tries = 20
     success = False
-    while (tries > 0):
+    while tries > 0:
         try:
             r = requests.get(url)
-            if r.status_code == 200:
-                success = True
-                break
-            else:
+            if r.status_code != 200:
                 logger.debug(r.status_code)
-                raise Exception
-        except Exception:
+            r.raise_for_status()
+            success = True
+            break
+        except requests.RequestException:
             tries -= 1
             print("Waiting for site to start, {} tries left".format(tries))
             time.sleep(5)
@@ -314,18 +315,16 @@ def wait_for_site(url):
     if success:
         print("Site successfully responded")
     else:
-        raise Exception("No response from target site")
+        raise TimeoutError("No response from target site")
 
 
 def run_site(args):
     logger.debug(args)
-    try:
+    if hasattr(args, 'pack'):
         rpz_path = Path(args.pack[0])
         if not rpz_path.exists():
             logger.critical("Can't Find RPZ file")
             sys.exit(1)
-    except AttributeError:
-        pass
 
     target = Path(args.target[0])
     if target.exists() and not args.skip_setup:
@@ -361,9 +360,9 @@ def run_site(args):
     if not Path(target / 'collections').is_dir():
         subprocess.Popen(['wb-manager', 'init', 'warc-data'], cwd=args.target[0])
 
-    try:
+    if hasattr(args, 'url'):
         url = args.url[0]
-    except AttributeError:
+    else:
         url = "http://localhost:{}".format(args.port)
     wait_for_site(url)
     return url
@@ -382,8 +381,6 @@ def record(args):
     if args.skip_record:
         pack_it(args)
         return
-    error = None
-    success = False
     try:
         url = run_site(args)
         signal.signal(signal.SIGINT, shutdown)
@@ -400,19 +397,16 @@ def record(args):
 
         driver.record(url, args.keep_browser)
         time.sleep(5) # ensure wayback finishes writing warc
-        success = True
 
         if args.keep_browser:
             input("Press Enter to stop recording and quit")
-    except Exception as e:
+    except Exception:
         logger.critical("Failure to record")
-        error = e
+        raise
     finally:
         subprocess_manager.shutdown()
-        if error:
-            raise error
-        if success:
-            pack_it(args)
+
+    pack_it(args)
 
 
 def live_record(args):
@@ -427,7 +421,7 @@ def live_record(args):
 
 def playback(args):
     replay_server_name = 'rpzdj-repl.ay'
-    error, network, proxy_container = None, None, None
+    network = site_container = pywb_container = proxy_container = None
     proxy_port = 8081
     target_dir = os.path.abspath(args.target[0])
     try:
@@ -470,28 +464,25 @@ def playback(args):
         driver.replay("http://{}".format(replay_server_name))
 
         input("Press Enter to quit")
-
-    except Exception as e:
-        error = e
     finally:
         if network:
             network.disconnect(site_container)
-            try:
-                network.disconnect(pywb_container)
-            except docker.errors.NotFound:
-                pass
-            try:
-                network.disconnect(proxy_container)
-            except docker.errors.NotFound:
-                pass
-            except docker.errors.NullResource:
-                pass
+            if pywb_container is not None:
+                try:
+                    network.disconnect(pywb_container)
+                except docker.errors.NotFound:
+                    pass
+            if proxy_container is not None:
+                try:
+                    network.disconnect(proxy_container)
+                except docker.errors.NotFound:
+                    pass
+                except docker.errors.NullResource:
+                    pass
             network.remove()
         subprocess_manager.shutdown()
 
-        if error:
-            raise error
-        sys.exit(0)
+    sys.exit(0)
 
 
 def setup(parser, **kwargs):
