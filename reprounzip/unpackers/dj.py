@@ -12,6 +12,7 @@ import docker.errors
 import pychrome
 from collections import deque
 import os
+import shutil
 import tarfile
 from reprounzip import signals
 from reprounzip.common import RPZPack
@@ -288,6 +289,22 @@ def register(stopable):
     subprocess_manager.register(stopable)
 
 
+def cleanup(args):
+    if args.skip_destroy or args.skip_run:
+        return
+    target = Path(args.target[0])
+    unpacked_info = read_dict(target)
+    image_name = unpacked_info['current_image'].decode()
+    client = docker.from_env()
+    container = list(c for c in client.containers.list() if c.image.tags.count("{}:latest".format(image_name)))[0]
+    image = container.image
+    container.stop()
+    container.remove()
+    if not args.skip_setup:
+        client.images.remove(image.id)
+        shutil.rmtree(str(target))
+
+
 def find_container(target):
     unpacked_info = read_dict(target)
     image_name = unpacked_info['current_image'].decode()
@@ -407,6 +424,7 @@ def record(args):
         subprocess_manager.shutdown()
 
     pack_it(args)
+    cleanup(args)
 
 
 def live_record(args):
@@ -525,6 +543,7 @@ def setup(parser, **kwargs):
         parser.add_argument('--skip-run', action='store_true', help="skip reprounzip run")
         if mode == 'record':
             parser.add_argument('--skip-record', action='store_true', help="Simply write WARC data from <target> back to <pack>")
+            parser.add_argument('--skip-destroy', action='store_true', help="Keep reprozip docker image, container, and target dir after recording")
         if mode == 'record' or mode == 'live-record':
             parser.add_argument('--keep-browser', action='store_true', help="Keep the Chromium browser open for manual recording")
         parser.add_argument('--quiet', action='store_true', help="shhhhhhh")
