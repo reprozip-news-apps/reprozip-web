@@ -39,6 +39,13 @@ class MissingWARCData(Exception):
 class WARCPacker(object):
 
     @staticmethod
+    def no_second_pass(rpz_file):
+        with tarfile.open(str(rpz_file)) as tar:
+            for name in tar.getnames():
+                if name[0:9] == 'WARC_DATA':
+                    raise InvalidRPZ("This RPZ archive already contains WARC data")
+
+    @staticmethod
     def data_path(filename, prefix=Path('WARC_DATA')):
         return prefix / filename.parts[-1]
 
@@ -46,9 +53,6 @@ class WARCPacker(object):
         self.tar = tarfile.open(str(rpz_file), 'a:')
 
     def add_warc_data(self, target, coll='warc-data'):
-        for name in self.tar.getnames():
-            if name[0:9] == 'WARC_DATA':
-                raise InvalidRPZ("This RPZ archive already contains WARC data")
         target = Path(target)
         warc_path = target / 'collections' / coll / 'archive'
         logger.debug(warc_path)
@@ -395,6 +399,7 @@ def pack_it(args):
 
 
 def record(args):
+    WARCPacker.no_second_pass(args.pack[0])
     if args.skip_record:
         pack_it(args)
         return
