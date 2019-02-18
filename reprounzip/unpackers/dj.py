@@ -10,7 +10,6 @@ import requests
 import docker
 import docker.errors
 import pychrome
-from collections import deque
 import os
 import shutil
 import tarfile
@@ -451,7 +450,26 @@ def docker_pull_if_not_exists(client, image):
         client.images.pull(image)
 
 
+def pywb_vols(target_dir, standalone=False):
+    if standalone:
+        vols = {
+            'pywb/uwsgi.ini': '/uwsgi/uwsgi.ini',
+            'pywb/standalone.py': '/app/app.py',
+            'pywb/standalone-config.yaml': '/webarchive/config.yaml'
+        }
+    else:
+        vols = {
+            'pywb/proxy-config.yaml': '/webarchive/config.yaml'
+        }
+
+    vols['pywb/templates'] = '/webarchive/templates'
+    vols[target_dir + '/collections'] = '/webarchive/collections'
+
+    return dict((os.path.abspath(k), {'bind': v}) for k, v in vols.items())
+
+
 def playback(args):
+    rpz_name = Path(args.pack[0]).name
     replay_server_name = 'rpzdj-repl.ay'
     network = site_container = pywb_container = proxy_container = None
     proxy_port = 8081
@@ -476,23 +494,28 @@ def playback(args):
         logger.info("PROXY NETWORK {}".format(network.name))
         network.connect(site_container)
 
-        pywb_container = client.containers.run('webrecorder/pywb', detach=True, remove=True, name='pywb-playback', network=network.name, volumes={'{}'.format(target_dir): {'bind': '/webarchive'}, '{}/pywb-playback-config.yaml'.format(os.getcwd()): {'bind': '/webarchive/config.yaml'}}, ports={'8080/tcp': Wayback.PORT})
+        vols = pywb_vols(target_dir, args.standalone)
+        logger.info("PYWB Container with volumes: {}".format(str(vols)))
+        pywb_container = client.containers.run('webrecorder/pywb', detach=True, remove=True, name='pywb-playback', network=network.name, volumes=vols, user='root', ports={'8080/tcp': Wayback.PORT}, environment=['RPZ_HOST=' + site_container.name+':' + args.port, 'RPZ_FAKE_URL=http://' + rpz_name])
+
         register(pywb_container)
         Wayback.wait_for_service(Wayback.PORT)
 
-        conf_string = subprocess.check_output(['sed', '-e', 's/PROXIED_SERVER/{}:{}/'.format(site_container.name, args.port), '-e', 's/SERVER_NAME/{}/'.format(replay_server_name), '-e', 's/PYWB_PORT/{}/'.format(Wayback.PORT), '-e', 's/PROXY_PORT/{}/'.format(proxy_port), 'replay-proxy-nginx.conf'])
-        conf_file = open('replay-proxy-for-{}.conf'.format(site_container.name), 'w')
-        conf_file.write(conf_string.decode())
-        conf_file.close()
+        if args.standalone:
+            print("Point your browser to http://localhost:{}/http://{}".format(Wayback.PORT, rpz_name))
+        else:
+            conf_string = subprocess.check_output(['sed', '-e', 's/PROXIED_SERVER/{}:{}/'.format(site_container.name, args.port), '-e', 's/SERVER_NAME/{}/'.format(replay_server_name), '-e', 's/PYWB_PORT/{}/'.format(Wayback.PORT), '-e', 's/PROXY_PORT/{}/'.format(proxy_port), 'replay-proxy-nginx.conf'])
+            conf_file = open('replay-proxy-for-{}.conf'.format(site_container.name), 'w')
+            conf_file.write(conf_string.decode())
+            conf_file.close()
 
-        proxy_container = client.containers.run('nginx', detach=True, remove=True, name='replay-proxy', network=network.name, volumes={'{}/replay-proxy-for-{}.conf'.format(os.getcwd(), site_container.name): {'bind': '/etc/nginx/conf.d/server.conf', 'mode': 'ro'}}, ports={'{}/tcp'.format(proxy_port): proxy_port})
-        register(proxy_container)
+            proxy_container = client.containers.run('nginx', detach=True, remove=True, name='replay-proxy', network=network.name, volumes={'{}/replay-proxy-for-{}.conf'.format(os.getcwd(), site_container.name): {'bind': '/etc/nginx/conf.d/server.conf', 'mode': 'ro'}}, ports={'{}/tcp'.format(proxy_port): proxy_port})
+            register(proxy_container)
 
-        driver = Driver.new_replay_driver()
-        driver.start()
-        register(driver)
-        driver.replay("http://{}".format(replay_server_name))
-
+            driver = Driver.new_replay_driver()
+            driver.start()
+            register(driver)
+            driver.replay("http://{}".format(replay_server_name))
         input("Press Enter to quit")
     finally:
         if network:
@@ -502,7 +525,7 @@ def playback(args):
                     network.disconnect(pywb_container)
                 except docker.errors.NotFound:
                     pass
-            if proxy_container is not None:
+            if not args.standalone and proxy_container is not None:
                 try:
                     network.disconnect(proxy_container)
                 except docker.errors.NotFound:
@@ -512,6 +535,7 @@ def playback(args):
             network.remove()
         subprocess_manager.shutdown()
 
+    cleanup(args)
     sys.exit(0)
 
 
@@ -542,13 +566,16 @@ def setup(parser, **kwargs):
         else:
             parser.add_argument('pack', nargs=1, help="RPZ file")
 
+        if mode == 'playback':
+            parser.add_argument('--standalone', action='store_true')
+
         parser.add_argument('target', nargs=1, help="target directory")
         parser.add_argument('--port', dest='port', help="webserver port", default=80)
         parser.add_argument('--skip-setup', action='store_true', help="skip reprounzip setup")
         parser.add_argument('--skip-run', action='store_true', help="skip reprounzip run")
+        parser.add_argument('--skip-destroy', action='store_true', help="Keep reprozip docker image, container, and target dir after recording or playback")
         if mode == 'record':
             parser.add_argument('--skip-record', action='store_true', help="Simply write WARC data from <target> back to <pack>")
-            parser.add_argument('--skip-destroy', action='store_true', help="Keep reprozip docker image, container, and target dir after recording")
         if mode == 'record' or mode == 'live-record':
             parser.add_argument('--keep-browser', action='store_true', help="Keep the Chromium browser open for manual recording")
         parser.add_argument('--quiet', action='store_true', help="shhhhhhh")

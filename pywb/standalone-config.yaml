@@ -1,0 +1,11 @@
+framed_replay: false
+collections:
+
+    $root:
+        sequence:
+            - name: store
+              index: ./collections/warc-data/indexes/
+              archive_paths: ./collections/warc-data/archive/
+
+            - name: reprozip
+              index: live_filter

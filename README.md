@@ -132,3 +132,14 @@ The final step is to merge the recorded data into the reprozip package:
 ```
 $ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
 ```
+
+## Using Wayback as a standalone frontend
+
+If you don't want to use a bespoke browser, or want to share an archive over the web,
+you can use the `--standalone` flag to play the site back like any other WARC collection:
+
+```
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --standalone
+$ curl http://localhost:8080/http://dollar4docs-20170309.rpz
+```
+
