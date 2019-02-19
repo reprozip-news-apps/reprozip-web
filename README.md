@@ -49,15 +49,9 @@ $ pip install -e .
 
 ## Step 1: Package a site using ReproZip
 
-Skip to step 2 if you already have an RPZ package.
+Skip to step 2 if you already have an RPZ package. Otherwise, see reprozip documentation:
 
-First run reprozip trace. For example (on Linux):
-
-```
-$ cd example
-$ reprozip trace .
-```
-See reprozip documentation for more information on creating an RPZ.
+https://reprozip.readthedocs.io/en/1.0.x/packing.html
 
 ## Step 2: Record the site assets from the RPZ using Webrecorder
 
@@ -68,6 +62,9 @@ For example:
 ```
 reprounzip dj record dollar4docs-20170309.rpz target --port 3000
 ```
+
+Note that the port number will depend on the webserver you captured in step 1. A Rails app
+will likely run on port 3000, a NodeJS app will likely run on port 8000. 
 
 You should see the WARC_DATA directory in the package now. For example:
 
@@ -92,12 +89,17 @@ shut everything down.
 
 ## Skipping reprounzip unpacking on subsequent runs
 
-The app should shut down everything except the docker container running the rpz'd site.
-
-You can stop it yourself or just reuse it for subsequent playbacks and records:
+When you finish recording, or exit a playback session, the unpacked container will be destroyed. You can prevent
+that from happening by using the `--skip-destroy` flag:
 
 ```
-$ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000 --skip-setup --skip-run
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-destroy
+```
+
+Then you can reuse the container on another playback session:
+
+```
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
 ```
 
 ## Packing and Recording Simultaneously
