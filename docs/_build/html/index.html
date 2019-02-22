@@ -9,13 +9,10 @@
     <title>Welcome to reprozip-news-app&#39;s documentation! &#8212; reprozip-news-app 2019-2-17 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
@@ -79,6 +76,11 @@ $ cd reprozip-news-apps
 $ pip install -e .
 </pre></div>
 </div>
+<p>In case you met error called &quot;Found existing installation&quot;, you can run above command as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -r requirements.txt --ignore-installed
+$ pip install -e .
+</pre></div>
+</div>
 </div>
 <div class="section" id="archiving-a-news-app">
 <h2>Archiving a news app<a class="headerlink" href="#archiving-a-news-app" title="Permalink to this headline">¶</a></h2>
@@ -89,7 +91,17 @@ $ pip install -e .
 </div>
 <div class="section" id="step-2-record-the-site-assets-from-the-rpz-using-webrecord">
 <h3>Step 2: Record the site assets from the RPZ using Webrecord<a class="headerlink" href="#step-2-record-the-site-assets-from-the-rpz-using-webrecord" title="Permalink to this headline">¶</a></h3>
-<p>You need an RPZ package and you need to know what port the packaged application runs on.</p>
+<p>You need an RPZ package and you need to know what port the packaged application runs on. Please make sure that docker is running
+and the port you want to use is available.</p>
+<p>You can check if docker is running by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
+</pre></div>
+</div>
+<p>This command will return <code class="docutils literal notranslate"><span class="pre">Cannot</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">Docker</span> <span class="pre">daemon</span></code> if docker is running. Otherwise, it will return a table that lists all docker container.
+To stop a container at certain port</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">stop</span> <span class="n">container_id</span>
+</pre></div>
+</div>
 <p>For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reprounzip</span> <span class="n">dj</span> <span class="n">record</span> <span class="n">dollar4docs</span><span class="o">-</span><span class="mf">20170309.</span><span class="n">rpz</span> <span class="n">target</span> <span class="o">--</span><span class="n">port</span> <span class="mi">3000</span>
 </pre></div>
@@ -108,10 +120,10 @@ $ pip install -e .
 </div>
 <div class="section" id="step-3-replay-the-site-and-verify-fidelity">
 <h3>Step 3: Replay the site and verify fidelity<a class="headerlink" href="#step-3-replay-the-site-and-verify-fidelity" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt>::</dt>
-<dd>$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000</dd>
-</dl>
+<p>Run command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000
+</pre></div>
+</div>
 <p>Now tab to your Chromium browser, turn off your wifi, and hit reload! Press Enter in your terminal session to shut everything down.</p>
 </div>
 <div class="section" id="skipping-reprounzip-unpacking-on-subsequent-runs">
@@ -124,9 +136,6 @@ $ pip install -e .
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
 </pre></div>
 </div>
-<ul class="simple">
-<li>You should try to install this repo first*</li>
-</ul>
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -147,7 +156,7 @@ $ pip install -e .
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
+  <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Welcome to reprozip-news-app's documentation!</a><ul>
 <li><a class="reference internal" href="#prototype-news-archiving-app">Prototype News Archiving App</a></li>
@@ -199,7 +208,7 @@ $ pip install -e .
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Web Archiv.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.8.
     </div>
   </body>
 </html>

@@ -54,10 +54,15 @@ Now clone the repo and cd into it::
 	
 Now install dependencies and the app into your virtualenv. Note that reprounzip-docker must be installed from Github for now.::
 
-$ pip install -r requirements.txt
-$ pip install -e .
+	$ pip install -r requirements.txt
+	$ pip install -e .
 		
+In case you met error called "Found existing installation", you can run above command as ::
+
+	$ pip install -r requirements.txt --ignore-installed
+	$ pip install -e .
 	
+
 ====================
 Archiving a news app
 ====================
@@ -75,7 +80,17 @@ Skip to step 2 if you already have an RPZ package. Otherwise, see `reprozip docu
 Step 2: Record the site assets from the RPZ using Webrecord
 -----------------------------------------------------------
 
-You need an RPZ package and you need to know what port the packaged application runs on.
+You need an RPZ package and you need to know what port the packaged application runs on. Please make sure that docker is running
+and the port you want to use is available.
+
+You can check if docker is running by ::
+
+	docker ps
+	
+This command will return ``Cannot connect to the Docker daemon`` if docker is running. Otherwise, it will return a table that lists all docker container.
+To stop a container at certain port ::
+
+	docker stop container_id
 
 For example::
 
@@ -97,7 +112,9 @@ You should see the WARC_DATA directory in the package now. For example::
 -------------------------------------------
 Step 3: Replay the site and verify fidelity
 -------------------------------------------
-::
+
+Run command ::
+
 	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000
 	
 Now tab to your Chromium browser, turn off your wifi, and hit reload! Press Enter in your terminal session to shut everything down.
@@ -115,10 +132,6 @@ Then you can reuse the container on another playback session::
 	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
 
 
-
-
-
-* You should try to install this repo first*
 
 .. toctree::
    :maxdepth: 2
