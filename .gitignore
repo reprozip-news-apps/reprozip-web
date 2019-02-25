@@ -1,0 +1,68 @@
+*.py[co]
+.DS_Store
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.i*86
+*.x86_64
+*.hex
+
+# Eclipse PyDev
+.project
+.pydevproject
+
+# PyCharm
+.idea
+
+# Qt Creator
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+
+# Vagrant
+.vagrant
+
+/tests/vagrant
+/docs/_build
