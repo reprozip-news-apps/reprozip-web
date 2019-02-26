@@ -315,6 +315,14 @@ def find_container(target):
                 if c.image.tags.count("{}:latest".format(image_name)))[0]
 
 
+def resource_path(project_path):
+    return os.path.abspath(Path(
+        os.path.dirname(os.path.realpath(__file__)),
+        '../', '../',
+        project_path
+    ))
+
+
 def cleanup(args):
     if args.skip_destroy or args.skip_run:
         return
@@ -480,7 +488,7 @@ def pywb_vols(target_dir, standalone=False):
     vols['pywb/templates'] = '/webarchive/templates'
     vols[target_dir + '/collections'] = '/webarchive/collections'
 
-    return dict((os.path.abspath(k), {'bind': v}) for k, v in vols.items())
+    return dict((resource_path(k), {'bind': v}) for k, v in vols.items())
 
 
 def playback(args):
@@ -533,7 +541,7 @@ def playback(args):
                  '-e', 's/SERVER_NAME/{}/'.format(replay_server_name),
                  '-e', 's/PYWB_PORT/{}/'.format(Wayback.PORT),
                  '-e', 's/PROXY_PORT/{}/'.format(proxy_port),
-                 'replay-proxy-nginx.conf'])
+                 resource_path('replay-proxy-nginx.conf')])
             conf_file = open(
                 'replay-proxy-for-{}.conf'.format(
                     site_container.name), 'w')
