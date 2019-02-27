@@ -36,6 +36,39 @@ Now install all the dependencies and the prototype::
 Archiving and Replaying a News App
 ==================================
 
+Reprounzip has three modes. :code:`record` mode  generate the warc and add it ot the .rpz file.
+:code:`playback` will playback the site using the warc.
+
+-----
+Flags
+-----
+
+Using :code:`--standalone` flag will point your current browser instead of Chromium to play the site.
+
+Using flag :code:`--port` to allocate webserver port for the playback
+ 
+.. note::
+
+	Please make sure there is not docker container running on this port number you provided.
+	This port number is based on which app you want to playback. For examples, A Rails app will 
+	likely run on port 3000, a NodeJS app will likely run on port 8000.
+
+Using flag :code:`--skip-setup` to skip reprounzip setup.
+
+Using flag :code:`--skip-run` to skip reprounzip run.
+
+Using flag :code:`--skip-destroy` will keep reprozip docker,image, container, and target directory 
+after recording or playback.
+
+Using flag :code:`--skip-record` will simply write WARC data from `target`
+back to `pack`
+
+Using flag :code:`--keep-browser` to keep browser open for manual recording. Otherwise,
+the browser will be shut down after recording.
+
+Using flag :code:`--quiet` will ...
+
+
 -------------------------------------
 Step 1: Package a site using ReproZip
 -------------------------------------
@@ -85,40 +118,10 @@ Then you can reuse the container on another playback session::
 
 	$ reprounzip dj playback <package> <target> --port <port> --skip-setup --skip-run
 
-=====
-Flags
-=====
-:code:`--standalone`
-
-:code:`--port`
-
-:code:`--skip-setup`
-
-:code:`--skip-run`
-
-:code:`--skip-destroy`
-
-:code:`--skip-record`
-
-:code:`--keep-browser`
-
-:code:`--quiet`
-
-
-
+----------------
+Testing Protocol
+----------------
 
 .. toctree::
    :maxdepth: 2
-
-   :caption: Contents:
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-=======
 
