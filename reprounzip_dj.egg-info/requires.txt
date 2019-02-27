@@ -1,0 +1,7 @@
+reprounzip>=1.0.10
+reprounzip-docker
+requests
+pywb
+pyppeteer
+pychrome
+docker

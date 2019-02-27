@@ -132,12 +132,33 @@ Then you can reuse the container on another playback session::
 	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
 
 
+=====
+Flags
+=====
+:code:`--standalone`
+
+:code:`--port`
+
+:code:`--skip-setup`
+
+:code:`--skip-run`
+
+:code:`--skip-destroy`
+
+:code:`--skip-record`
+
+:code:`--keep-browser`
+
+:code:`--quiet`
+
+
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-	
+
 
 Indices and tables
 ==================

@@ -1,0 +1,13 @@
+README.md
+setup.cfg
+setup.py
+reprounzip/__init__.py
+reprounzip/unpackers/__init__.py
+reprounzip/unpackers/dj.py
+reprounzip_dj.egg-info/PKG-INFO
+reprounzip_dj.egg-info/SOURCES.txt
+reprounzip_dj.egg-info/dependency_links.txt
+reprounzip_dj.egg-info/entry_points.txt
+reprounzip_dj.egg-info/namespace_packages.txt
+reprounzip_dj.egg-info/requires.txt
+reprounzip_dj.egg-info/top_level.txt

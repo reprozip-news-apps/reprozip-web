@@ -1,0 +1,12 @@
+docker-pycreds>=0.4.0
+requests!=2.18.0,>=2.14.2
+six>=1.4.0
+websocket-client>=0.32.0
+
+[ssh]
+paramiko>=2.4.2
+
+[tls]
+cryptography>=1.3.4
+idna>=2.0.0
+pyOpenSSL>=17.5.0

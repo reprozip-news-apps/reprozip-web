@@ -1,0 +1,12 @@
+pychrome/__init__.py,sha256=oPlmIx9If2IFXPErGXI_hYKJE2WpqB3i3OKP5kJPKLI,180
+pychrome/browser.py,sha256=KisbTohNRrxkwBf3YUkX-m-a2wEM_m301l9EzO93Ac8,2133
+pychrome/cli.py,sha256=6eWLNw4U9K5tRrxdfquIemGBcvCLfkJdZih9BUXEeSs,2940
+pychrome/exceptions.py,sha256=q30Yy1VsGXYGItUIQ_7qOPUd7T1sBlYVAfhpgOcOxts,416
+pychrome/tab.py,sha256=eLZAMy6CJMOtLOwgGmLpV_NHshpJurgWPtsAdqhk-vY,7079
+pychrome-0.2.2.dist-info/DESCRIPTION.rst,sha256=MfgKd_yXlI5ZpBnQpbcYrX6ngRfP7xX0UOQZqlGr-Js,3360
+pychrome-0.2.2.dist-info/METADATA,sha256=e9qI9W5e5ZD1jHlMpO4SA0CpXzFOGo4nCSQsg77_xyw,4252
+pychrome-0.2.2.dist-info/RECORD,,
+pychrome-0.2.2.dist-info/WHEEL,sha256=o2k-Qa-RMNIJmUdIc7KU6VWR_ErNRbWNlxDIpl7lm34,110
+pychrome-0.2.2.dist-info/entry_points.txt,sha256=Bxk8WwMsdNjlJF1EPQp7a9ztd9lfcOH2o-39Ya5r0jM,48
+pychrome-0.2.2.dist-info/metadata.json,sha256=IV_3XR1x5KswAErRLOzcEqWZzvbTptXPaHgrxW9iJUw,1175
+pychrome-0.2.2.dist-info/top_level.txt,sha256=grI_W9PxWLskQV4myyGXdG6k6cXt4nZs837EFjbP224,9
