@@ -1,3 +1,0 @@
-[reprounzip.unpackers]
-dj = reprounzip.unpackers.dj:setup
-
