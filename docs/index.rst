@@ -1,106 +1,60 @@
-.. reprozip-news-app documentation master file, created by
-   sphinx-quickstart on Sun Feb 17 13:59:40 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+ReproZip News App Archiving Tool's Documentation
+================================================
 
-Welcome to reprozip-news-app's documentation!
-=============================================
+Welcome to ReproZip News App Archiving Tool's documentation!
+This tool is a prototype that leverages `ReproZip <https://www.reprozip.org/>`_ and `Webrecorder <https://webrecorder.io/>`_ to archive data journalism news apps and allows users to replay these apps with little to no effort.
 
-Here is an introduction for how to use reprounzip
+=========================
+Installation Instructions
+=========================
 
-1. Introduction
-2. Prerequisites
-3. Development Install
+Python 2.7.3 or greater, or 3.3 or greater is required. If you don't have Python on your machine, you can get it from `python.org <https://www.python.org/>`__. You will also need the `pip <https://pip.pypa.io/en/latest/installing/>`__ installer and `Docker <https://www.docker.com/>`__.
 
-============================
-Prototype News Archiving App
-============================
+For Debian and Ubuntu, you can get most of the required dependencies using APT::
 
-A work-in-progress app that leverages ReproZip and Webrecorder to capture archival packages of data journalism websites.
+    apt-get install python python-dev python-pip
 
-=============
-Prerequisites
-=============
+For Fedora and CentOS, you can get most of the dependencies using the Yum packaging manager::
 
-You will need to install the Docker server and havie it running on your system. See `this link <https://docs.docker.com>`_.
+    yum install python python-devel
 
-You will also nedd Python 3 and pip. One way to do this is using Pyenv. For example, on OSX command line (using `Homebrew <https://brew.sh/>`_)::
+For macOS, be sure to upgrade `setuptools`::
 
-	brew install pyenv
+    $ pip install -U setuptools
 
-On Debian/Ubuntu::
-
-	sudo apt install python3.7 python3.7-dev virtualenv docker.io
-
-===================
-Development Install
-===================
-
-At some point the app will likely be installed from a registry, like most Python libraries. For now, it must be installed from a local directory.
-
-Recommendation: Use pyenv and virtualenv (or pipenv) to create a self-contained virtual environment::
-
-	$ pyenv local 3.7
-	$ pip install virtualenv
-	$ virtualenv .
-	$ source bin/activate
-	
-Note that the port number will depend on the webserver you captured in step 1. A Rails app will likely run on port 3000, a NodeJS app will likely run on port 8000.
-
-Now clone the repo and cd into it::
+After installing these required dependencies, clone the repository and cd into it::
 	
 	$ git clone https://github.com/reprozip-news-apps/reprozip-news-apps
 	$ cd reprozip-news-apps
 	
-Now install dependencies and the app into your virtualenv. Note that reprounzip-docker must be installed from Github for now.::
+Now install all the dependencies and the prototype::
 
 	$ pip install -r requirements.txt
 	$ pip install -e .
-		
-In case you met error called "Found existing installation", you can run above command as ::
 
-	$ pip install -r requirements.txt --ignore-installed
-	$ pip install -e .
-	
-
-====================
-Archiving a news app
-====================
-
-Below is an instruction to pack and unpack a news app from `ProPublica <https://www.propublica.org/>`_
+==================================
+Archiving and Replaying a News App
+==================================
 
 -------------------------------------
 Step 1: Package a site using ReproZip
 -------------------------------------
 
-Skip to step 2 if you already have an RPZ package. Otherwise, see `reprozip documentation:
-<https://reprozip.readthedocs.io/en/1.0.x/packing.html>`_. Reprozip only runs on Linux.
+Skip to step 2 if you already have an ``.rpz`` package. Otherwise, follow the `ReproZip's documentation <https://reprozip.readthedocs.io/en/1.0.x/packing.html>`_ to package a news app using ReproZip.
 
------------------------------------------------------------
-Step 2: Record the site assets from the RPZ using Webrecord
------------------------------------------------------------
+-----------------------------------------------------------------
+Step 2: Record the site assets from the package using Webrecorder
+-----------------------------------------------------------------
 
-You need an RPZ package and you need to know what port the packaged application runs on. Please make sure that docker is running
-and the port you want to use is available.
+Make sure that you have Docker installed and running. Given an `.rpz` package from a news app, you can run the following command::
 
-You can check if docker is running by ::
+	reprounzip dj record <package> <target> --port <port>
 
-	docker ps
-	
-This command will return ``Cannot connect to the Docker daemon`` if docker is running. Otherwise, it will return a table that lists all docker container.
-To stop a container at certain port ::
+where ``<package>`` is the ``.rpz`` file, ``<target>`` is the target directory for ReproZip, and ``<port>`` is the port number where the news app run. For instance, a Rails app will likely run on port ``3000``, while a NodeJS app will likely run on port ``8000``.
 
-	docker stop container_id
+You should be able to see the ``WARC_DATA`` directory in the package now::
 
-For example::
-
-	reprounzip dj record dollar4docs-20170309.rpz target --port 3000
-
-Note that the port number will depend on the webserver you captured in step 1. A Rails app will likely run on port 3000, a NodeJS app will likely run on port 8000.
-
-You should see the WARC_DATA directory in the package now. For example::
-
-	$ tar -t -f dollar4docs-20170309.rpz
+	$ tar -t -f <package>
 	-rw-------  0 root   root 729415801 Mar  9  2017 DATA.tar.gz
 	-rw-------  0 root   root        19 Mar  9  2017 METADATA/version
 	-rw-r--r--  0 root   root   5912576 Mar  9  2017 METADATA/trace.sqlite3
@@ -109,28 +63,27 @@ You should see the WARC_DATA directory in the package now. For example::
 	-rw-r--r--  0 hoffman staff    37089 Jan 11 09:16 WARC_DATA/autoindex.cdxj
 
 
--------------------------------------------
-Step 3: Replay the site and verify fidelity
--------------------------------------------
+---------------------------
+Step 3: Replay the news app
+---------------------------
 
-Run command ::
+To replay the package news app, run the following command::
 
-	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000
+	$ reprounzip dj playback <package> <target> --port <port>
 	
-Now tab to your Chromium browser, turn off your wifi, and hit reload! Press Enter in your terminal session to shut everything down.
+Now you can go to your Chromium browser, turn off your Wi-Fi, and hit reload. Press Enter in your terminal session to shut everything down.
 
-------------------------------------------------
-Skipping reprounzip unpacking on subsequent runs
-------------------------------------------------
+-----------------------------
+Skipping removal of container
+-----------------------------
 
-When you finish recording, or exit a playback session, the unpacked container will be destroyed. You can prevent that from happening by using the --skip-destroy flag::
+When you finish recording, or exit a playback session, the unpacked container will be automatically destroyed. You can prevent this from happening by using the ``--skip-destroy`` flag::
 
-	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-destroy
+	$ reprounzip dj playback <package> <target> --port <port> --skip-destroy
 
 Then you can reuse the container on another playback session::
 
-	$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
-
+	$ reprounzip dj playback <package> <target> --port <port> --skip-setup --skip-run
 
 =====
 Flags
@@ -156,6 +109,7 @@ Flags
 
 .. toctree::
    :maxdepth: 2
+
    :caption: Contents:
 
 
@@ -166,3 +120,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+=======
+
