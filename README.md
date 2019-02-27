@@ -12,6 +12,12 @@ You will also need python3 and pip. One way to do this is using Pyenv. For examp
 brew install pyenv
 ```
 
+On Debian/Ubuntu:
+
+```
+sudo apt install python3.7 python3.7-dev virtualenv docker.io
+```
+
 ## Development Install
 
 At some point the app will likely be installed from a registry, like most Python libraries. For now, it must be
@@ -43,15 +49,9 @@ $ pip install -e .
 
 ## Step 1: Package a site using ReproZip
 
-Skip to step 2 if you already have an RPZ package.
+Skip to step 2 if you already have an RPZ package. Otherwise, see reprozip documentation:
 
-First run reprozip trace. For example (on Linux):
-
-```
-$ cd example
-$ reprozip trace .
-```
-See reprozip documentation for more information on creating an RPZ.
+https://reprozip.readthedocs.io/en/1.0.x/packing.html
 
 ## Step 2: Record the site assets from the RPZ using Webrecorder
 
@@ -62,6 +62,9 @@ For example:
 ```
 reprounzip dj record dollar4docs-20170309.rpz target --port 3000
 ```
+
+Note that the port number will depend on the webserver you captured in step 1. A Rails app
+will likely run on port 3000, a NodeJS app will likely run on port 8000. 
 
 You should see the WARC_DATA directory in the package now. For example:
 
@@ -86,11 +89,59 @@ shut everything down.
 
 ## Skipping reprounzip unpacking on subsequent runs
 
-The app should shut down everything except the docker container running the rpz'd site.
-
-You can stop it yourself or just reuse it for subsequent playbacks and records:
+When you finish recording, or exit a playback session, the unpacked container will be destroyed. You can prevent
+that from happening by using the `--skip-destroy` flag:
 
 ```
-$ reprounzip dj playback dollar4docs-20170309-2.rpz target --port 3000 --skip-setup --skip-run
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-destroy
+```
+
+Then you can reuse the container on another playback session:
+
+```
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
+```
+
+## Packing and Recording Simultaneously
+
+You can run reprozip trace and record at the same time, using two different terminals
+(both on the site host, or one on the site host and one on a different host).
+
+Terminal 1:
+
+```
+$ cd /path/to/your/project
+$ reprozip trace .runserver
+```
+
+Terminal 2:
+
+```
+$ mkdir /path/to/target
+$ reprounzip dj live-record http://localhost:3000 /path/to/target
+```
+
+Wait for the recorder to finish, then go back to Terminal 1 and press CTRL-C.
+
+Terminal 1:
+
+```
+$ reprozip pack /path/to/captured-site.rpz
+```
+
+The final step is to merge the recorded data into the reprozip package:
+
+```
+$ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
+```
+
+## Using Wayback as a standalone frontend
+
+If you don't want to use a bespoke browser, or want to share an archive over the web,
+you can use the `--standalone` flag to play the site back like any other WARC collection:
+
+```
+$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --standalone
+$ curl http://localhost:8080/http://dollar4docs-20170309.rpz
 ```
 
