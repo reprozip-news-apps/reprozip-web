@@ -19,9 +19,16 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'reprozip-news-app'
-copyright = '2019, Web Archiv'
-author = 'Web Archiv'
+project = u'ReproZip News App Archiving Tool'
+copyright = u'2017-2018, New York University'
+
+authors = [u'Brian Hoffman', u'Remi Rampin',
+           u'Fernando Chirigati', u'Vicky Steeves'
+           u'Katy Boss']
+if len(authors) <= 1:
+    authors_str = u', '.join(authors)
+else:
+    authors_str = u', '.join(authors[:-1]) + u', and ' + authors[-1]
 
 # The short X.Y version
 version = ''
@@ -133,8 +140,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'reprozip-news-app.tex', 'reprozip-news-app Documentation',
-     'Web Archiv', 'manual'),
+    (master_doc, u'reprozip-news-app.tex', u'ReproZip News App Archiving Tool Documentation',
+     authors_str, 'manual'),
 ]
 
 
@@ -142,10 +149,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'reprozip-news-app', 'reprozip-news-app Documentation',
-     [author], 1)
-]
+man_pages = []
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -154,8 +158,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'reprozip-news-app', 'reprozip-news-app Documentation',
-     author, 'reprozip-news-app', 'One line description of project.',
+    (master_doc, u'ReproZip News App Archiving Tool',
+     'ReproZip News App Archiving Tool Documentation',
+     authors_str, 'ReproZip News App Archiving Tool',
+     u'Archives news apps and replays them with little to no effort.',
      'Miscellaneous'),
 ]
 

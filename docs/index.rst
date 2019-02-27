@@ -36,54 +36,23 @@ Now install all the dependencies and the prototype::
 Archiving and Replaying a News App
 ==================================
 
-Reprounzip has three modes. :code:`record` mode  generate the warc and add it ot the .rpz file.
-:code:`playback` will playback the site using the warc.
-
------
-Flags
------
-
-Using :code:`--standalone` flag will point your current browser instead of Chromium to play the site.
-
-Using flag :code:`--port` to allocate webserver port for the playback
- 
-.. note::
-
-	Please make sure there is not docker container running on this port number you provided.
-	This port number is based on which app you want to playback. For examples, A Rails app will 
-	likely run on port 3000, a NodeJS app will likely run on port 8000.
-
-Using flag :code:`--skip-setup` to skip reprounzip setup.
-
-Using flag :code:`--skip-run` to skip reprounzip run.
-
-Using flag :code:`--skip-destroy` will keep reprozip docker,image, container, and target directory 
-after recording or playback.
-
-Using flag :code:`--skip-record` will simply write WARC data from `target`
-back to `pack`
-
-Using flag :code:`--keep-browser` to keep browser open for manual recording. Otherwise,
-the browser will be shut down after recording.
-
-Using flag :code:`--quiet` will ...
-
-
--------------------------------------
-Step 1: Package a site using ReproZip
--------------------------------------
+-----------------------------------------
+Step 1: Package a Web site using ReproZip
+-----------------------------------------
 
 Skip to step 2 if you already have an ``.rpz`` package. Otherwise, follow the `ReproZip's documentation <https://reprozip.readthedocs.io/en/1.0.x/packing.html>`_ to package a news app using ReproZip.
 
------------------------------------------------------------------
-Step 2: Record the site assets from the package using Webrecorder
------------------------------------------------------------------
+---------------------------------------------------------------------
+Step 2: Record the Web site assets from the package using Webrecorder
+---------------------------------------------------------------------
 
 Make sure that you have Docker installed and running. Given an `.rpz` package from a news app, you can run the following command::
 
 	reprounzip dj record <package> <target> --port <port>
 
 where ``<package>`` is the ``.rpz`` file, ``<target>`` is the target directory for ReproZip, and ``<port>`` is the port number where the news app run. For instance, a Rails app will likely run on port ``3000``, while a NodeJS app will likely run on port ``8000``.
+
+Note that, while recording, the `Chromium Web browser <https://www.chromium.org/Home>`__ will be used to open the news app. When the recording is done, Chromium will automatically close.
 
 You should be able to see the ``WARC_DATA`` directory in the package now::
 
@@ -95,6 +64,14 @@ You should be able to see the ``WARC_DATA`` directory in the package now::
 	-rw-r--r--  0 hoffman staff   807498 Jan 11 09:16 WARC_DATA/rec-20190111141622981410-anything.local.warc.gz
 	-rw-r--r--  0 hoffman staff    37089 Jan 11 09:16 WARC_DATA/autoindex.cdxj
 
+The following flags can also be used when running the ``reprounzip dj record`` application:
+
+* ``--quiet``: hides terminal messages.
+* ``--keep-browser``: keeps the Web browser open for manual recording.
+* ``--skip-record``: writes ``WARC`` data from ``<target>`` directory without recording the news app again.
+* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
+* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
+* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after recording the news app.
 
 ---------------------------
 Step 3: Replay the news app
@@ -104,7 +81,15 @@ To replay the package news app, run the following command::
 
 	$ reprounzip dj playback <package> <target> --port <port>
 	
-Now you can go to your Chromium browser, turn off your Wi-Fi, and hit reload. Press Enter in your terminal session to shut everything down.
+The Chromium Web browser will automatically open, and you can turn off your Wi-Fi and hit reload to explore the news app. Press Enter in your terminal session to shut everything down.
+
+The following flags can also be used when running the ``reprounzip dj replay`` application:
+
+* ``--quiet``: hides terminal messages.
+* ``--standalone``: opens the archived news app in your default Web browser instead of Chromium.
+* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
+* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
+* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after replaying the news app.
 
 -----------------------------
 Skipping removal of container
@@ -118,9 +103,6 @@ Then you can reuse the container on another playback session::
 
 	$ reprounzip dj playback <package> <target> --port <port> --skip-setup --skip-run
 
-----------------
-Testing Protocol
-----------------
 
 .. toctree::
    :maxdepth: 2
