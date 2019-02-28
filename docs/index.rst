@@ -86,7 +86,7 @@ The Chromium Web browser will automatically open, and you can turn off your Wi-F
 The following flags can also be used when running the ``reprounzip dj replay`` application:
 
 * ``--quiet``: hides terminal messages.
-* ``--standalone``: opens the archived news app in your default Web browser instead of Chromium.
+* ``--standalone``: runs the archived news app as a wayback collection you can share over the web. Does not launch a browser.
 * ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
 * ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
 * ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after replaying the news app.
