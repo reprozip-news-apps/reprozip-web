@@ -6,6 +6,8 @@ import subprocess
 import signal
 import time
 import requests
+import websocket
+import json
 import docker
 import docker.errors
 import pychrome
@@ -98,7 +100,7 @@ class SubprocessManager(object):
 
     def shutdown(self):
         for r in self.running:
-            print(repr(r))
+            logger.debug(r)
             try:
                 r.stop()
             except docker.errors.NotFound:
@@ -234,6 +236,9 @@ class Driver(object):
         self.proc = subprocess.Popen([
             self.chromium_executable,
             '--remote-debugging-port={}'.format(self.CDP_PORT),
+            '--disable-notifications',
+            '--disable-infobars',
+            '--disable-breakpad',
             *self.flags
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
@@ -241,7 +246,7 @@ class Driver(object):
         res = None
         while tries > 0:
             try:
-                res = requests.get(self.cdp_url())
+                res = requests.get(self.cdp_url() + '/json/version')
                 break
             except requests.RequestException:
                 time.sleep(5)
@@ -252,31 +257,44 @@ class Driver(object):
             raise Exception("Bad status code from Chrome: "
                             "{}".format(res.status_code))
 
+        self.browser_ws_url = res.json()['webSocketDebuggerUrl']
+        self.browser = pychrome.Browser(url=self.cdp_url())
+        self.tab_zero = self.browser.list_tab()[0]
         logger.info("Chromium is fired up and ready to go!")
 
     def cdp_url(self):
         return "http://localhost:{}".format(self.CDP_PORT)
 
     def stop(self):
+        for t in self.browser.list_tab():
+            try:
+                t.stop()
+            except pychrome.exceptions.RuntimeException:
+                pass
+        message = {
+            'id': 9999,
+            'method': 'Browser.close'
+        }
+        json_message = json.dumps(message)
+        ws = websocket.create_connection(self.browser_ws_url)
+        ws.send(json_message)
         if self.proc:
-            self.proc.kill()
+            self.proc.terminate()
 
     def replay(self, url_to_visit):
-        browser = pychrome.Browser(url=self.cdp_url())
-        tab = browser.new_tab()
+        tab = self.browser.new_tab()
         tab.start()
         tab.call_method("Network.enable")
         tab.call_method("Page.navigate", url=url_to_visit)
 
     def record(self, url_to_visit, keep_open=False):
-        browser = pychrome.Browser(url=self.cdp_url())
         logger.info("Recording {}".format(url_to_visit))
         record_url = "http://{}:{}/{}/record/{}".format(
             self.PYWB_HOST,
             Wayback.PORT,
             self.coll_name,
             url_to_visit)
-        tab = browser.new_tab()
+        tab = self.browser.new_tab()
         tab.start()
         seconds_since_something_happened = [0]
 
@@ -291,7 +309,7 @@ class Driver(object):
         if keep_open:
             return 0
         tab.stop()
-        browser.close_tab(tab)
+        self.browser.close_tab(tab)
         return 0
 
 
@@ -351,11 +369,11 @@ def wait_for_site(url):
             break
         except requests.RequestException:
             tries -= 1
-            print("Waiting for site to start, {} tries left".format(tries))
+            logger.info("Waiting for site to start, {} tries left".format(tries))
             time.sleep(5)
 
     if success:
-        print("Site successfully responded")
+        logger.info("Site successfully responded")
     else:
         raise TimeoutError("No response from target site")
 
@@ -425,6 +443,8 @@ def record(args):
     if args.skip_record:
         pack_it(args)
         return
+    if args.quiet:
+        logger.setLevel(30)
     try:
         url = run_site(args)
         signal.signal(signal.SIGINT, shutdown)
@@ -492,6 +512,8 @@ def pywb_vols(target_dir, standalone=False):
 
 
 def playback(args):
+    if args.quiet:
+        logger.setLevel(30)
     rpz_name = Path(args.pack[0]).name
     replay_server_name = 'rpzdj-repl.ay'
     network = site_container = pywb_container = proxy_container = None
