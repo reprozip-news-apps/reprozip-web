@@ -369,7 +369,8 @@ def wait_for_site(url):
             break
         except requests.RequestException:
             tries -= 1
-            logger.info("Waiting for site to start, {} tries left".format(tries))
+            logger.info("Waiting for site to start, {} tries "
+                        "left".format(tries))
             time.sleep(5)
 
     if success:
@@ -636,7 +637,9 @@ def setup(parser, **kwargs):
             parser.add_argument('pack', nargs=1, help="RPZ file")
 
         if mode == 'playback':
-            parser.add_argument('--standalone', action='store_true')
+            parser.add_argument('--standalone', action='store_true',
+                                help="run in webserver mode and view in "
+                                "any browser")
 
         parser.add_argument('target', nargs=1, help="target "
                             "directory")
