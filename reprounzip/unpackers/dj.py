@@ -512,11 +512,21 @@ def pywb_vols(target_dir, standalone=False):
     return dict((resource_path(k), {'bind': v}) for k, v in vols.items())
 
 
+def set_hostname(args):
+    if not args.hostname:
+        return 'rpzdj-repl.ay'
+    if args.hostname[0][0:7] == 'http://':
+        return args.hostname[0][7:]
+    if args.hostname[0][0:8] == 'https://':
+        return args.hostname[0][8:]
+    return args.hostname[0]
+
+
 def playback(args):
     if args.quiet:
         logger.setLevel(30)
     rpz_name = Path(args.pack[0]).name
-    replay_server_name = 'rpzdj-repl.ay'
+    replay_server_name = set_hostname(args)
     network = site_container = pywb_container = proxy_container = None
     proxy_port = 8081
     target_dir = os.path.abspath(args.target[0])
@@ -640,6 +650,8 @@ def setup(parser, **kwargs):
             parser.add_argument('--standalone', action='store_true',
                                 help="run in webserver mode and view in "
                                 "any browser")
+            parser.add_argument('--hostname', nargs=1, help="specify the "
+                                "hostname for the proxy server")
 
         parser.add_argument('target', nargs=1, help="target "
                             "directory")

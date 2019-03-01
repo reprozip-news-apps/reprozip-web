@@ -83,10 +83,11 @@ To replay the package news app, run the following command::
 
 The Chromium Web browser will automatically open, and you can turn off your Wi-Fi and hit reload to explore the news app. Press Enter in your terminal session to shut everything down.
 
-The following flags can also be used when running the ``reprounzip dj replay`` application:
+The following flags can also be used when running the ``reprounzip dj playback`` application:
 
 * ``--quiet``: hides terminal messages.
 * ``--standalone``: runs the archived news app as a wayback collection you can share over the web. Does not launch a browser.
+* ``--hostname``: sets the hostname used by the proxy server and displayed in the browser's location bar.
 * ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
 * ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
 * ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after replaying the news app.
