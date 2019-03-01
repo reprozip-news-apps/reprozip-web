@@ -108,27 +108,28 @@ Then you can reuse the container on another playback session::
 Packing and Recording Simultaneously
 ------------------------------------
 
-You can run reprozip trace and reprounzip dj record at the same time, using two different terminals (both on the site host, or one on the site host and one on a different host).
+You can run ``reprozip trace`` and ``reprounzip dj record`` at the same time, using two different terminals: both on the site host, or one on the site host and one on a different host.
 
 Terminal 1::
 
   $ cd /path/to/your/project
-  $ reprozip trace .runserver
+  $ reprozip trace <application>
 
 Terminal 2::
 
   $ mkdir /path/to/target
-  $ reprounzip dj live-record http://localhost:3000 /path/to/target
+  $ reprounzip dj live-record <localhost-link> <target>
 
-Wait for the recorder to finish, then go back to Terminal 1 and press CTRL-C.
+where ``<localhost-link>`` is the local link to the news app (e.g.: ``http://localhost:3000``).
+Wait for the recorder to finish, then go back to Terminal 1 and press ``CTRL-C``.
 
 Terminal 1::
 
-  $ reprozip pack /path/to/captured-site.rpz
+  $ reprozip pack reprozip-package.rpz
 
-The final step is to merge the recorded data into the reprozip package::
+The final step is to merge the recorded data into the ReproZip package::
 
-  $ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
+  $ reprounzip dj record reprozip-package.rpz <target> --skip-record
 
 
 .. toctree::
