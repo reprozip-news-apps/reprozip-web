@@ -278,6 +278,8 @@ class Driver(object):
         json_message = json.dumps(message)
         ws = websocket.create_connection(self.browser_ws_url)
         ws.send(json_message)
+        time.sleep(1)
+        ws.close()
         if self.proc:
             self.proc.terminate()
 
@@ -351,8 +353,16 @@ def cleanup(args):
     container.remove()
     if not args.skip_setup:
         client = docker.from_env()
-        client.images.remove(image.id)
-        shutil.rmtree(str(target))
+        try:
+            client.images.remove(image.id)
+        except docker.errors.APIError as e:
+            print(str(e))
+            force = input("Force image removal? (Y/n)")
+            if force.upper() == 'Y':
+                client.images.remove(image.id, force=True)
+        finally:
+            shutil.rmtree(str(target))
+
 
 
 def wait_for_site(url):
@@ -380,7 +390,6 @@ def wait_for_site(url):
 
 
 def run_site(args):
-    logger.debug(args)
     if hasattr(args, 'pack'):
         rpz_path = Path(args.pack[0])
         if not rpz_path.exists():
