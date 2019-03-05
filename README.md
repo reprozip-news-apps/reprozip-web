@@ -60,7 +60,7 @@ You need an RPZ package and you need to know what port the packaged application 
 For example:
 
 ```
-reprounzip dj record dollar4docs-20170309.rpz target --port 3000
+reprounzip dj record news-app.rpz target --port 3000
 ```
 
 Note that the port number will depend on the webserver you captured in step 1. A Rails app
@@ -69,7 +69,7 @@ will likely run on port 3000, a NodeJS app will likely run on port 8000.
 You should see the WARC_DATA directory in the package now. For example:
 
 ```
-$ tar -t -f dollar4docs-20170309.rpz
+$ tar -t -f news-app.rpz
 -rw-------  0 root   root 729415801 Mar  9  2017 DATA.tar.gz
 -rw-------  0 root   root        19 Mar  9  2017 METADATA/version
 -rw-r--r--  0 root   root   5912576 Mar  9  2017 METADATA/trace.sqlite3
@@ -81,7 +81,7 @@ $ tar -t -f dollar4docs-20170309.rpz
 ## Step 3: Replay the site and verify fidelity
 
 ```
-$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000
+$ reprounzip dj playback news-app.rpz target --port 3000
 ```
 
 Now tab to your Chromium browser, turn off your wifi, and hit reload! Press Enter in your terminal session to
@@ -93,13 +93,13 @@ When you finish recording, or exit a playback session, the unpacked container wi
 that from happening by using the `--skip-destroy` flag:
 
 ```
-$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-destroy
+$ reprounzip dj playback news-app.rpz target --port 3000 --skip-destroy
 ```
 
 Then you can reuse the container on another playback session:
 
 ```
-$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --skip-setup --skip-run
+$ reprounzip dj playback news-app.rpz target --port 3000 --skip-setup --skip-run
 ```
 
 ## Packing and Recording Simultaneously
@@ -141,7 +141,7 @@ If you don't want to use a bespoke browser, or want to share an archive over the
 you can use the `--standalone` flag to play the site back like any other WARC collection:
 
 ```
-$ reprounzip dj playback dollar4docs-20170309.rpz target --port 3000 --standalone
-$ curl http://localhost:8080/http://dollar4docs-20170309.rpz
+$ reprounzip dj playback news-app.rpz target --port 3000 --standalone
+$ curl http://localhost:8080/http://news-app.rpz
 ```
 
