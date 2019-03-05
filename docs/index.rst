@@ -129,37 +129,6 @@ Terminal 1::
 The final step is to merge the recorded data into the reprozip package::
 
   $ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
-
-
-================
-Testing Protocol
-================
-
-In this section, we use a news app from ProPublica as a demo for usage of `reprounzip`. 
-Please see the original application by clicking this 
-`link <https://projects.propublica.org/docdollars/>`_. After unpacking and playback the RPZ file 
-`dollar4docs-20170309.rpz`, Chromium will display the news application shown in the following figures. 
-
-.. figure:: _static/ui1.png
-	:target: _static/ui1.png
-	:height: 800px
-	:width: 1200px
-	:scale: 50 %
-	:align: center
-	
-All action and information have recorded into RPZ file during packing process. Therefore,
-turning off wifi, you can navigate the news app and reproduce the experiment. For this application,
-the search functionality of `Has Your Health Professional Received Drug Company Money?` has been 
-retained. The hyperlink of `state` table and the information of company `Allergan` can be accessed 
-during playback. These two tables are shown in the following table.
-
-.. figure:: _static/ui2.png
-	:target: _static/ui2.png
-	:height: 1200px
-	:width: 1200px
-	:scale: 50 %
-	:align: center
 	 
-	
 .. toctree::
    :maxdepth: 2
