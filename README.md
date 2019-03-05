@@ -69,7 +69,7 @@ will likely run on port 3000, a NodeJS app will likely run on port 8000.
 You should see the WARC_DATA directory in the package now. For example:
 
 ```
-$ tar -t -f dollar4docs-20170309.rpz
+$ tar -t -f news-app.rpz
 -rw-------  0 root   root 729415801 Mar  9  2017 DATA.tar.gz
 -rw-------  0 root   root        19 Mar  9  2017 METADATA/version
 -rw-r--r--  0 root   root   5912576 Mar  9  2017 METADATA/trace.sqlite3
