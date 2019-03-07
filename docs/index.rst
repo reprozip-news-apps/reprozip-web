@@ -135,10 +135,12 @@ The final step is to merge the recorded data into the reprozip package::
 Testing Protocol
 ================
 
-In this section, we use a news app from ProPublica as a demo for usage of `reprounzip`. 
+In this section, we use an open-source news app from Guardian as a demo for usage of `reprounzip`. 
 Please see the original application by clicking this 
-`link <https://projects.propublica.org/docdollars/>`_. After unpacking and playback the RPZ file 
-`dollar4docs-20170309.rpz`, Chromium will display the news application shown in the following figures. 
+`link <https://github.com/guardian/interactive-election-polls-2015>`_. You can follow the documentation of 
+`ReproZip <https://www.reprozip.org/>`_ and the git repo to pack the interactive election polls app. 
+Then, you can follow step 2 and step 3 of this documentation. 
+Chromium will display the news application shown in the following figures. 
 
 .. figure:: _static/ui1.png
 	:target: _static/ui1.png
@@ -147,15 +149,16 @@ Please see the original application by clicking this
 	:scale: 50 %
 	:align: center
 	
-All action and information have recorded into RPZ file during packing process. Therefore,
+All action and information have been recorded into RPZ file during packing process. Therefore,
 turning off wifi, you can navigate the news app and reproduce the experiment. For this application,
-the search functionality of `Has Your Health Professional Received Drug Company Money?` has been 
-retained. The hyperlink of `state` table and the information of company `Allergan` can be accessed 
-during playback. These two tables are shown in the following table.
+it has rich interactive plots on the site. The full interactivity is retained after turning off your
+wifi. The expected effect is shown in the following figure. The hover text on each interactive
+plot is retained, but if you click the button that links to an external site, you will have a no
+internet error.
 
 .. figure:: _static/ui2.png
 	:target: _static/ui2.png
-	:height: 1200px
+	:height: 700px
 	:width: 1200px
 	:scale: 50 %
 	:align: center
