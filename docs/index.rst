@@ -130,7 +130,6 @@ The final step is to merge the recorded data into the reprozip package::
 
   $ reprounzip dj record /path/to/captured-site.rpz /path/to/target --skip-record
 
-
 ================
 Testing Protocol
 ================
@@ -162,7 +161,7 @@ internet error.
 	:width: 1200px
 	:scale: 50 %
 	:align: center
+=======
 	 
-	
 .. toctree::
    :maxdepth: 2
