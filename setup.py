@@ -2,8 +2,8 @@ import io
 import os
 from setuptools import setup, find_packages
 
-setup(name='reprounzip-dj',
-      version='0.0.1',
+setup(name='reprozip-web',
+      version='0.1',
       packages=['reprounzip', 'reprounzip.unpackers'],
       entry_points={
           'reprounzip.unpackers': [
@@ -17,4 +17,4 @@ setup(name='reprounzip-dj',
           'pyppeteer',
           'pychrome',
           'docker'],
-      description="Allows the ReproZip unpacker to record and replay data journalism websites packaged as .rpz files")
+      description="Allows the ReproZip unpacker to record and replay web applications packaged as .rpz files")

@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'ReproZip News App Archiving Tool'
+project = u'ReproZip Web'
 copyright = u'2017-2018, New York University'
 
 authors = [u'Brian Hoffman', u'Remi Rampin',
@@ -31,9 +31,9 @@ else:
     authors_str = u', '.join(authors[:-1]) + u', and ' + authors[-1]
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
-release = '2019-2-17'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -109,7 +109,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'reprozip-news-appdoc'
+htmlhelp_basename = 'reprozip-web-doc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -136,7 +136,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, u'reprozip-news-app.tex', u'ReproZip News App Archiving Tool Documentation',
+    (master_doc, u'reprozip-web.tex', u'ReproZip Web Documentation',
      authors_str, 'manual'),
 ]
 
@@ -154,10 +154,10 @@ man_pages = []
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, u'ReproZip News App Archiving Tool',
-     'ReproZip News App Archiving Tool Documentation',
-     authors_str, 'ReproZip News App Archiving Tool',
-     u'Archives news apps and replays them with little to no effort.',
+    (master_doc, u'ReproZip Web',
+     'ReproZip Web Documentation',
+     authors_str, 'ReproZip Web',
+     u'Archives web applications and replays them with little to no effort.',
      'Miscellaneous'),
 ]
 

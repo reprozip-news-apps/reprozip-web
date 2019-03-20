@@ -1,8 +1,8 @@
-ReproZip News App Archiving Tool's Documentation
+ReproZip Web's Documentation
 ================================================
 
-Welcome to ReproZip News App Archiving Tool's documentation!
-This tool is a prototype that leverages `ReproZip <https://www.reprozip.org/>`_ and `Webrecorder <https://webrecorder.io/>`_ to archive data journalism news apps and allows users to replay these apps with little to no effort.
+Welcome to ReproZip Web's documentation!
+This tool is a prototype that leverages `ReproZip <https://www.reprozip.org/>`_ and `Webrecorder <https://webrecorder.io/>`_ to archive web applications and allows users to replay these apps with little to no effort.
 
 =========================
 Installation Instructions
@@ -24,35 +24,35 @@ For macOS, be sure to upgrade `setuptools`::
 
 After installing these required dependencies, clone the repository and cd into it::
 
-  $ git clone https://github.com/reprozip-news-apps/reprozip-news-apps
-  $ cd reprozip-news-apps
+  $ git clone https://github.com/reprozip-news-apps/reprozip-web
+  $ cd reprozip-web
 
 Now install all the dependencies and the prototype::
 
   $ pip install -r requirements.txt
   $ pip install -e .
 
-==================================
-Archiving and Replaying a News App
-==================================
+=================================
+Archiving and Replaying a Web App
+=================================
 
 -----------------------------------------
 Step 1: Package a Web site using ReproZip
 -----------------------------------------
 
-Skip to step 2 if you already have an ``.rpz`` package. Otherwise, follow the `ReproZip's documentation <https://reprozip.readthedocs.io/en/1.0.x/packing.html>`_ to package a news app using ReproZip.
+Skip to step 2 if you already have an ``.rpz`` package. Otherwise, follow the `ReproZip's documentation <https://reprozip.readthedocs.io/en/1.0.x/packing.html>`_ to package a web app using ReproZip.
 
 ---------------------------------------------------------------------
 Step 2: Record the Web site assets from the package using Webrecorder
 ---------------------------------------------------------------------
 
-Make sure that you have Docker installed and running. Given an `.rpz` package from a news app, you can run the following command::
+Make sure that you have Docker installed and running. Given an `.rpz` package from a web app, you can run the following command::
 
   reprounzip dj record <package> <target> --port <port>
 
-where ``<package>`` is the ``.rpz`` file, ``<target>`` is the target directory for ReproZip, and ``<port>`` is the port number where the news app run. For instance, a Rails app will likely run on port ``3000``, while a NodeJS app will likely run on port ``8000``.
+where ``<package>`` is the ``.rpz`` file, ``<target>`` is the target directory for ReproZip, and ``<port>`` is the port number where the web app run. For instance, a Rails app will likely run on port ``3000``, while a NodeJS app will likely run on port ``8000``.
 
-Note that, while recording, the `Chromium Web browser <https://www.chromium.org/Home>`__ will be used to open the news app. When the recording is done, Chromium will automatically close.
+Note that, while recording, the `Chromium Web browser <https://www.chromium.org/Home>`__ will be used to open the web app. When the recording is done, Chromium will automatically close.
 
 You should be able to see the ``WARC_DATA`` directory in the package now::
 
@@ -68,29 +68,29 @@ The following flags can also be used when running the ``reprounzip dj record`` a
 
 * ``--quiet``: hides terminal messages.
 * ``--keep-browser``: keeps the Web browser open for manual recording.
-* ``--skip-record``: writes ``WARC`` data from ``<target>`` directory without recording the news app again.
-* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
-* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
-* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after recording the news app.
+* ``--skip-record``: writes ``WARC`` data from ``<target>`` directory without recording the web app again.
+* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the web app was already unpacked by ReproZip.
+* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the web app was already unpacked by ReproZip.
+* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after recording the web app.
 
----------------------------
-Step 3: Replay the news app
----------------------------
+--------------------------
+Step 3: Replay the web app
+--------------------------
 
-To replay the package news app, run the following command::
+To replay the package web app, run the following command::
 
   $ reprounzip dj playback <package> <target> --port <port>
 
-The Chromium Web browser will automatically open, and you can turn off your Wi-Fi and hit reload to explore the news app. Press Enter in your terminal session to shut everything down.
+The Chromium Web browser will automatically open, and you can turn off your Wi-Fi and hit reload to explore the web app. Press Enter in your terminal session to shut everything down.
 
 The following flags can also be used when running the ``reprounzip dj playback`` application:
 
 * ``--quiet``: hides terminal messages.
-* ``--standalone``: runs the archived news app as a wayback collection you can share over the web. Does not launch a browser.
+* ``--standalone``: runs the archived web app as a wayback collection you can share over the web. Does not launch a browser.
 * ``--hostname``: sets the hostname used by the proxy server and displayed in the browser's location bar.
-* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the news app was already unpacked by ReproZip.
-* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the news app was already unpacked by ReproZip.
-* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after replaying the news app.
+* ``--skip-setup``: skips the ``reprounzip setup`` step. This option can only be used if the web app was already unpacked by ReproZip.
+* ``--skip-run``: skips the ``reprounzip run`` step. This option can only be used if the web app was already unpacked by ReproZip.
+* ``--skip-destroy``: does not destroy the Docker container and ``<target>`` directory after replaying the web app.
 
 -----------------------------
 Skipping removal of container
@@ -120,7 +120,7 @@ Terminal 2::
   $ mkdir /path/to/target
   $ reprounzip dj live-record <localhost-link> <target>
 
-where ``<localhost-link>`` is the local link to the news app (e.g.: ``http://localhost:3000``).
+where ``<localhost-link>`` is the local link to the web app (e.g.: ``http://localhost:3000``).
 Wait for the recorder to finish, then go back to Terminal 1 and press ``CTRL-C``.
 
 Terminal 1::
