@@ -449,7 +449,11 @@ def pack_it(args):
 
 
 def record(args):
-    WARCPacker.no_second_pass(args.pack[0])
+    try:
+        WARCPacker.no_second_pass(args.pack[0])
+    except AttributeError:
+        pass
+
     if args.skip_record:
         pack_it(args)
         return
