@@ -1,6 +1,6 @@
 # [Deprecated — see https://web.reprozip.org] Prototype Web Archiving App
 
-A 2018 prototype of ReproZip-Web (see current: 'https://web.reprozip.org/') that leverages ReproZip and Webrecorder to capture archival packages of data journalism websites. Deprecated in 2021. 
+A 2018 prototype of ReproZip-Web (see current: https://web.reprozip.org/) that leverages ReproZip and Webrecorder to capture archival packages of data journalism websites. Deprecated in 2021.
 
 ## Prerequisites
 
